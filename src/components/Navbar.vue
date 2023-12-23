@@ -68,7 +68,9 @@ const options = [
 const handleSelect = (key: string | number) => {
   //message.info(String(key));
   console.log(key);
-  isLoggedIn.value = false;
+  if(key=='logout') {
+    isLoggedIn.value = false;
+  }
 };
 const handleButtonClick = (route: string) => {
   console.log(`按钮点击: ${route}`);

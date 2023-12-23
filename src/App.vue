@@ -3,7 +3,7 @@
 // import Main from './components/Main.vue'
 // import Table from './components/Table.vue';
 import Navbar from './components/Navbar.vue'
-import Test from './components/Test.vue';
+// import Test from './components/Test.vue';
 import Search from './components/Search.vue'
 import List from './components/List.vue'
 </script>
@@ -12,9 +12,11 @@ import List from './components/List.vue'
   <!-- <HelloWorld msg="Vite + Vue!!!!!!" /> -->
   <div id="app">
     <Navbar></Navbar>
-    <h1>
+    <div id="title">
+      <h1>
       悬赏平台
     </h1>
+    </div>
     <Search></Search>
   </div>
   <!-- <n-message-provider>
@@ -24,5 +26,9 @@ import List from './components/List.vue'
 </template>
 
 <style scoped>
-
+  #title{
+    display: flex;
+      align-items: center;
+      justify-content: center;
+  }
 </style>
