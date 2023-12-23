@@ -1,22 +1,32 @@
 <template>
-  <div class="list-container">
-    <n-list hoverable clickable>
-      <n-space vertical>
-        <n-list-item v-for="requirement in requirements" :key="requirement.requireid">
-        <n-thing :title="requirement.title" content-style="margin-top: 10px;">
-          <template #description>
-            <n-space size="small" style="margin-top: 4px">
-              <n-tag :bordered="false" type="info" size="small">
-                {{ requirement.reward }}
-              </n-tag>
-            </n-space>
-          </template>
-          {{ requirement.description }}
-        </n-thing>
-      </n-list-item>
-      </n-space>
-    </n-list>
-  </div>
+  <n-space vertical size="large" style="align-items: center; margin-top: 20px;">
+    <n-card size="huge" v-for="requirement in requirements" :key="requirement.requireid" :title="requirement.title" hoverable @click="handleCardClick" class="custom-card">
+      <span>
+        <!-- 显示用户名 -->
+        {{ requirement.username }}
+      </span>
+      <template #header-extra>
+        <n-space vertical>
+          <n-avatar
+            :size="58"
+            src="https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg"
+          />
+          {{ requirement.username }}
+        </n-space>
+      </template>
+      <template #footer>
+        <div style="display: flex; justify-content: flex-end;">
+          <n-tag :bordered="false" type="warning" size="large" :round="true">
+            {{ requirement.reward }}
+          </n-tag>
+        </div>
+      </template>
+      {{ requirement.description }}
+    </n-card>
+    <n-card title="卡片" hoverable>
+      卡片内容
+    </n-card>
+  </n-space>
 </template>
 
 <script lang="ts">
@@ -32,20 +42,31 @@ interface Requirement {
   createtime: string;
   endtime: string;
   status: string;
+  // 新增用户信息
+  username: string;
 }
 
 export default defineComponent({
   setup() {
-    // 使用 ref 创建响应式数据
     const requirements = ref<Requirement[]>([]);
 
-    // 在组件加载时调用后端接口
+    const handleCardClick = () => {
+      console.log('卡片被点击了！');
+    };
+
     onMounted(async () => {
       try {
-        // 发起 GET 请求获取需求列表
         const response: AxiosResponse<Requirement[]> = await axios.get('http://localhost:80/require');
 
-        // 将返回的需求列表数据赋值给 requirements
+        // 遍历需求列表，获取用户信息
+        for (const requirement of response.data) {
+          // 根据 userid 发起请求获取用户信息
+          const userResponse: AxiosResponse<any> = await axios.get(`http://localhost:80/user/${requirement.userid}`);
+
+          // 将用户信息添加到 requirement 对象中
+          requirement.username = userResponse.data.username;
+        }
+
         requirements.value = response.data;
       } catch (error) {
         console.error('Error fetching requirements:', error);
@@ -54,13 +75,19 @@ export default defineComponent({
 
     return {
       requirements,
+      handleCardClick,
     };
   },
 });
 </script>
 
 <style scoped>
-.list-container {
-  padding: 50px 650px;
+.n-card {
+  width: 660px;
+  cursor: pointer;
+}
+.myfooter{
+  display: flex;
+  justify-content: flex-end;
 }
 </style>

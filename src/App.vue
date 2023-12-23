@@ -9,8 +9,7 @@ import List from './components/List.vue'
 </script>
 
 <template>
-  <!-- <HelloWorld msg="Vite + Vue!!!!!!" /> -->
-  <div id="app">
+    <div id="app">
     <Navbar></Navbar>
     <div id="title">
       <h1>
@@ -18,11 +17,8 @@ import List from './components/List.vue'
     </h1>
     </div>
     <Search></Search>
+    <List></List>
   </div>
-  <!-- <n-message-provider>
-    <Table></Table>
-  </n-message-provider> -->
-  <List></List>
 </template>
 
 <style scoped>
