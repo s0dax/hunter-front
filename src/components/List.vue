@@ -85,6 +85,7 @@ export default defineComponent({
 .n-card {
   width: 660px;
   cursor: pointer;
+  border-radius: 10px;
 }
 .myfooter{
   display: flex;
