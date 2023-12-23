@@ -3,7 +3,7 @@
 // import Main from './components/Main.vue'
 // import Table from './components/Table.vue';
 import Navbar from './components/Navbar.vue'
-// import Table from './components/Table.vue';
+import Test from './components/Test.vue';
 import Search from './components/Search.vue'
 import List from './components/List.vue'
 </script>
@@ -13,7 +13,7 @@ import List from './components/List.vue'
   <div id="app">
     <Navbar></Navbar>
     <h1>
-      1111
+      悬赏平台
     </h1>
     <Search></Search>
   </div>

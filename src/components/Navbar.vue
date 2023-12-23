@@ -1,4 +1,3 @@
-<!-- Navbar.vue -->
 <template>
   <div class="navbar">
     <div class="nav-left">
@@ -21,7 +20,7 @@
       </template>
       <template v-else>
         <!-- 已登录时显示用户头像和下拉菜单 -->
-        <n-dropdown :options="options">
+        <n-dropdown :options="options" @select="handleSelect">
           <n-avatar
             round
             size="medium"
@@ -33,78 +32,56 @@
   </div>
 </template>
 
-<script lang="ts">
-import { h, defineComponent, ref } from 'vue';
-import type { Component } from 'vue'
-import { NIcon } from 'naive-ui'
+<script setup lang="ts">
+import { ref,h } from 'vue';
+import { NIcon } from 'naive-ui';
 import {
   PersonCircleOutline as UserIcon,
   Pencil as EditIcon,
   LogOutOutline as LogoutIcon
-} from '@vicons/ionicons5'
+} from '@vicons/ionicons5';
 
-const renderIcon = (icon: Component) => {
-  return () => {
-    return h(NIcon, null, {
-      default: () => h(icon)
-    })
+const renderIcon = (icon: any) => () => h(NIcon, null, { default: () => h(icon) });
+const isLoggedIn = ref(false);
+// const handleLogout = () => {
+//   console.log('退出账号点击');
+//   isLoggedIn.value = false; // 退出账号成功后设置为 false
+// };
+
+const options = [
+  {
+    label: '用户资料',
+    key: 'profile',
+    icon: renderIcon(UserIcon)
+  },
+  {
+    label: '编辑用户资料',
+    key: 'editProfile',
+    icon: renderIcon(EditIcon)
+  },
+  {
+    label: '退出登录',
+    key: 'logout',
+    icon: renderIcon(LogoutIcon),
   }
-}
+];
+const handleSelect = (key: string | number) => {
+  //message.info(String(key));
+  console.log(key);
+  isLoggedIn.value = false;
+};
+const handleButtonClick = (route: string) => {
+  console.log(`按钮点击: ${route}`);
+};
 
-export default defineComponent({
-  setup () {
-    const isLoggedIn = ref(false);
+const handleLogin = () => {
+  console.log('登录点击');
+  isLoggedIn.value = true; // 登录成功后设置为 true
+};
 
-    const handleLogout = () => {
-      console.log('退出账号点击');
-      // NMessage.success('退出登录成功');
-      isLoggedIn.value = false; // 退出账号成功后设置为 false
-    };
-
-    const options = [
-      {
-        label: '用户资料',
-        key: 'profile',
-        icon: renderIcon(UserIcon)
-      },
-      {
-        label: '编辑用户资料',
-        key: 'editProfile',
-        icon: renderIcon(EditIcon)
-      },
-      {
-        label: '退出登录',
-        key: 'logout',
-        icon: renderIcon(LogoutIcon),
-        onClick: handleLogout
-      }
-    ];
-
-    return {
-      options,
-      isLoggedIn,
-    };
-  },
-  methods: {
-    handleButtonClick(route: string) {
-      console.log(`按钮点击: ${route}`);
-    },
-    handleLogin() {
-      console.log('登录点击');
-      this.isLoggedIn = true; // 登录成功后设置为 true
-      // 使用 $nextTick 确保在下一个视图更新周期中进行检查和更新
-      this.$nextTick(() => {
-        // 在这里检查是否已经登录成功，如果已经登录则隐藏登录和注册按钮
-        if (this.isLoggedIn) {
-          this.$forceUpdate(); // 强制更新视图
-        }
-      });
-    },
-    handleRegister() {
-      console.log('注册点击');
-    },
-  },
-});
+const handleRegister = () => {
+  console.log('注册点击');
+};
 </script>
 
 <style scoped>

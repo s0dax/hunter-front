@@ -1,101 +1,62 @@
 <template>
   <div class="list-container">
     <n-list hoverable clickable>
-      <n-list-item v-for="item in backendData" :key="item.id">
-        <n-thing :title="item.title" :content-style="item.contentStyle">
+      <n-space vertical>
+        <n-list-item v-for="requirement in requirements" :key="requirement.requireid">
+        <n-thing :title="requirement.title" content-style="margin-top: 10px;">
           <template #description>
             <n-space size="small" style="margin-top: 4px">
-              <n-tag v-for="tag in item.tags" :key="tag" :bordered="false" type="info" size="small">
-                {{ tag }}
+              <n-tag :bordered="false" type="info" size="small">
+                {{ requirement.reward }}
               </n-tag>
             </n-space>
           </template>
-          {{ item.description }}
+          {{ requirement.description }}
         </n-thing>
       </n-list-item>
+      </n-space>
     </n-list>
   </div>
 </template>
 
 <script lang="ts">
-import { ref } from 'vue';
+import { defineComponent, ref, onMounted } from 'vue';
+import axios, { AxiosResponse } from 'axios';
 
-export default {
+interface Requirement {
+  userid: number;
+  requireid: number;
+  title: string;
+  description: string;
+  reward: string;
+  createtime: string;
+  endtime: string;
+  status: string;
+}
+
+export default defineComponent({
   setup() {
     // 使用 ref 创建响应式数据
-    const backendData = ref([
-      {
-        id: 1,
-        title: '标题',
-        contentStyle: 'margin-top: 10px;',
-        tags: ['代取', '代取'],
-        description: '这里是一段描述这里也是一段描述',
-      },
-      {
-        id: 2,
-        title: '标题',
-        contentStyle: 'margin-top: 10px;',
-        tags: ['代取', '代取'],
-        description: '这里是一段描述这里也是一段描述',        
-      },
-      {
-        id: 3,
-        title: '标题',
-        contentStyle: 'margin-top: 10px;',
-        tags: ['代取', '代取'],
-        description: '这里是一段描述这里也是一段描述',        
-      },
-      {
-        id: 1,
-        title: '标题',
-        contentStyle: 'margin-top: 10px;',
-        tags: ['代取', '代取'],
-        description: '这里是一段描述这里也是一段描述',
-      },
-      {
-        id: 2,
-        title: '标题',
-        contentStyle: 'margin-top: 10px;',
-        tags: ['代取', '代取'],
-        description: '这里是一段描述这里也是一段描述',        
-      },
-      {
-        id: 3,
-        title: '标题',
-        contentStyle: 'margin-top: 10px;',
-        tags: ['代取', '代取'],
-        description: '这里是一段描述这里也是一段描述',        
-      },
-      {
-        id: 1,
-        title: '标题',
-        contentStyle: 'margin-top: 10px;',
-        tags: ['代取', '代取'],
-        description: '这里是一段描述这里也是一段描述',
-      },
-      {
-        id: 2,
-        title: '标题',
-        contentStyle: 'margin-top: 10px;',
-        tags: ['代取', '代取'],
-        description: '这里是一段描述这里也是一段描述',        
-      },
-      {
-        id: 3,
-        title: '标题',
-        contentStyle: 'margin-top: 10px;',
-        tags: ['代取', '代取'],
-        description: '这里是一段描述这里也是一段描述这里是一段描述这里也是一段描述这里是一段描述这里也是一段描述这里是一段描述这里也是一段描述这里是一段描述这里也是一段描述这里是一段描述这里也是一段描述',        
-      },
-      // 可以根据后端数据的结构添加更多项
-    ]);
+    const requirements = ref<Requirement[]>([]);
 
-    // 返回组件的初始状态
+    // 在组件加载时调用后端接口
+    onMounted(async () => {
+      try {
+        // 发起 GET 请求获取需求列表
+        const response: AxiosResponse<Requirement[]> = await axios.get('http://localhost:80/require');
+
+        // 将返回的需求列表数据赋值给 requirements
+        requirements.value = response.data;
+      } catch (error) {
+        console.error('Error fetching requirements:', error);
+      }
+    });
+
     return {
-      backendData,
+      requirements,
     };
   },
-};
+});
 </script>
 
 <style scoped>
