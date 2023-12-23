@@ -1,6 +1,6 @@
 <template>
   <n-space vertical size="large" style="align-items: center; margin-top: 20px;">
-    <n-card size="huge" v-for="requirement in requirements" :key="requirement.requireid" :title="requirement.title" hoverable @click="handleCardClick" class="custom-card">
+    <n-card embedded size="huge" v-for="requirement in requirements" :key="requirement.requireid" :title="requirement.title" hoverable @click="handleCardClick" class="custom-card">
       <span>
         <!-- 显示用户名 -->
         {{ requirement.username }}
@@ -16,7 +16,7 @@
       </template>
       <template #footer>
         <div style="display: flex; justify-content: flex-end;">
-          <n-tag :bordered="false" type="warning" size="large" :round="true">
+          <n-tag :bordered="false" type="warning" size="large" :round="true" style="font-weight: bold;">
             {{ requirement.reward }}
           </n-tag>
         </div>
