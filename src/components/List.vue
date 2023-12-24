@@ -1,40 +1,38 @@
 <template>
-  <div id="outer" align-items= center; style="justify-content: center;display: flex;align-items: center;">
-    <n-space size="large" style="align-items: center; margin-top: 20px;width: 80%;">
-    <n-card embedded size="huge" v-for="requirement in requirements" :key="requirement.requireid" hoverable @click="handleCardClick" class="custom-card">
-      <template #header>
-        <div>
-          <h3>
-            {{ requirement.title }}
-          </h3>
+    <n-list size="large" style="align-items: center; margin-top: 20px;width: 80%;">
+      <n-list-item style="margin: 10px;">
+        <div style="padding: 10px;" embedded size="huge" v-for="requirement in requirements" :key="requirement.requireid" hoverable @click="handleCardClick" class="custom-card">
+          <n-card >
+            <template #header>
+              <div>
+                <h3>
+                  {{ requirement.title }}
+                </h3>
+              </div>
+            </template>
+          <template #header-extra>
+            <div style="width: 100px; text-align:right; margin-right: 0px; padding-right: 0px;">
+              <n-space vertical>
+                <n-avatar
+                  :size="58"
+                  src="https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg"
+                />
+                  {{ requirement.username }}
+              </n-space>
+            </div>
+          </template>
+          <template #footer>
+            <div style="display: flex; justify-content: flex-end;">
+              <n-tag :bordered="false" type="warning" size="large" :round="true" style="font-weight: bold;">
+                {{ requirement.reward }}元
+              </n-tag>
+            </div>
+          </template>
+            {{ requirement.description }}
+          </n-card>
         </div>
-      </template>
-      <template #header-extra>
-        <div style="height:80px; width: 100px; text-align:right; margin-right: 0px; padding-right: 0px;">
-        <n-space vertical>
-          <n-avatar
-            :size="58"
-            src="https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg"
-          />
-          {{ requirement.username }}
-        </n-space>
-        </div>
-      </template>
-      <template #footer>
-        <div style="display: flex; justify-content: flex-end;">
-          <n-tag :bordered="false" type="warning" size="large" :round="true" style="font-weight: bold;">
-            {{ requirement.reward }}元
-          </n-tag>
-        </div>
-      </template>
-      {{ requirement.description }}
-    </n-card>
-    <n-card title="卡片" hoverable>
-      卡片内容
-    </n-card>
-  </n-space>
-  </div>
-  
+      </n-list-item>
+  </n-list>
 </template>
 
 <script lang="ts">
@@ -92,7 +90,6 @@ export default defineComponent({
 <style scoped>
 .n-card {
   max-width: 600px;
-  max-height: 300px;
   cursor: pointer;
   border-radius: 10px;
 }
