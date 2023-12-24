@@ -1,10 +1,14 @@
 <template>
-  <n-space vertical size="large" style="align-items: center; margin-top: 20px;">
-    <n-card embedded size="huge" v-for="requirement in requirements" :key="requirement.requireid" :title="requirement.title" hoverable @click="handleCardClick" class="custom-card">
-      <span>
-        <!-- 显示用户名 -->
-        {{ requirement.username }}
-      </span>
+  <div id="outer" align-items= center; style="justify-content: center;display: flex;align-items: center;">
+    <n-space size="large" style="align-items: center; margin-top: 20px;width: 80%;">
+    <n-card embedded size="huge" v-for="requirement in requirements" :key="requirement.requireid" hoverable @click="handleCardClick" class="custom-card">
+      <template #header>
+        <div>
+          <h3>
+            {{ requirement.title }}
+          </h3>
+        </div>
+      </template>
       <template #header-extra>
         <n-space vertical>
           <n-avatar
@@ -17,7 +21,7 @@
       <template #footer>
         <div style="display: flex; justify-content: flex-end;">
           <n-tag :bordered="false" type="warning" size="large" :round="true" style="font-weight: bold;">
-            {{ requirement.reward }}
+            {{ requirement.reward }}元
           </n-tag>
         </div>
       </template>
@@ -27,6 +31,8 @@
       卡片内容
     </n-card>
   </n-space>
+  </div>
+  
 </template>
 
 <script lang="ts">
@@ -83,12 +89,16 @@ export default defineComponent({
 
 <style scoped>
 .n-card {
-  width: 660px;
+  max-width: 600px;
+  max-height: 300px;
   cursor: pointer;
   border-radius: 10px;
 }
 .myfooter{
   display: flex;
   justify-content: flex-end;
+}
+.n-card-header {
+  font-weight: bold;
 }
 </style>
