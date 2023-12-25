@@ -10,6 +10,7 @@
         </div>
       </template>
       <template #header-extra>
+        <div style="height:80px; width: 100px; text-align: right;">
         <n-space vertical>
           <n-avatar
             :size="58"
@@ -17,6 +18,7 @@
           />
           {{ requirement.username }}
         </n-space>
+        </div>
       </template>
       <template #footer>
         <div style="display: flex; justify-content: flex-end;">
