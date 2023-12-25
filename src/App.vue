@@ -4,7 +4,7 @@
 // import Table from './components/Table.vue';
 import Navbar from './components/Navbar.vue'
 // import Test from './components/Test.vue';
-import Search from './components/Search.vue'
+// import Search from './components/Search.vue'
 import List from './components/List.vue'
 </script>
 
@@ -16,7 +16,6 @@ import List from './components/List.vue'
       悬赏平台
     </h1>
     </div>
-    <Search></Search>
     <List></List>
   </div>
 </template>
