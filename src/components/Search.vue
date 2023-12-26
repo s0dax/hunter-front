@@ -1,6 +1,6 @@
 <template>
     <div class="search-container">
-        <n-input size="large" round placeholder="搜索" autosize style="min-width: 70%;"/>
+        <n-input size="large" round placeholder="搜索" style="max-width: 70%;"/>
         <n-button size = "large" round type="primary">
             <n-icon><search /></n-icon>
         </n-button>
@@ -20,7 +20,7 @@ export default defineComponent({
 
 <style scoped>
 .search-container {
-  width: 60%;
+  min-width: 60%;
   display: flex;
   align-items: center; /* 垂直居中 */
   justify-content: center;
