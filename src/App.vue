@@ -6,6 +6,7 @@ import Navbar from './components/Navbar.vue'
 // import Test from './components/Test.vue';
 // import Search from './components/Search.vue'
 import List from './components/List.vue'
+import Post from './components/Post.vue'
 </script>
 
 <template>
@@ -15,6 +16,7 @@ import List from './components/List.vue'
       <h1>
       悬赏平台
     </h1>
+    <Post></Post>
     </div>
     <List></List>
   </div>

@@ -1,6 +1,6 @@
 <template>
   <div id="outer" align-items= center; style="justify-content: center;display: flex;align-items: center;">
-    <n-space size="large" style="align-items: center; margin-top: 20px;width: 80%;">
+    <n-space vertical size="large" style="align-items: center; margin-top: 20px;width: 80%;">
     <n-card embedded size="huge" v-for="requirement in requirements" :key="requirement.requireid" hoverable @click="handleCardClick" class="custom-card">
       <template #header>
         <div>
@@ -29,16 +29,25 @@
       </template>
       {{ requirement.description }}
     </n-card>
-    <n-card title="卡片" hoverable>
+    <n-pagination
+    size="large"
+    v-model:page="page"
+    v-model:page-size="pageSize"
+    v-model:page-count="totalPages"
+    show-size-picker
+    :page-sizes="[10, 20, 30]"
+    style="margin-bottom: 20px;margin-top: 10px;"
+  />
+    <!-- <n-card title="卡片" hoverable>
       卡片内容
-    </n-card>
+    </n-card> -->
   </n-space>
   </div>
   
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from 'vue';
+import { defineComponent, ref, onMounted, watch } from 'vue';
 import axios, { AxiosResponse } from 'axios';
 
 interface Requirement {
@@ -54,34 +63,61 @@ interface Requirement {
   username: string;
 }
 
+interface IPage<T> {
+  current: number;
+  pages: number;
+  size: number;
+  total: number;
+  records: T[];
+}
+
 export default defineComponent({
   setup() {
     const requirements = ref<Requirement[]>([]);
+    const page = ref(1);
+    const pageSize = ref(10);
+    const totalPages = ref(0);
 
-    const handleCardClick = () => {
-      console.log('卡片被点击了！');
+    const handleCardClick = (requirement: Requirement) => {
+      console.log('卡片被点击了！', requirement);
     };
 
-    onMounted(async () => {
+    const fetchData = async () => {
       try {
-        const response: AxiosResponse<Requirement[]> = await axios.get('http://localhost:80/require');
+        const response: AxiosResponse<IPage<Requirement>> = await axios.get(`http://43.143.250.26:80/require/findByCreateTime/`, {
+          params: {
+            pageNum: page.value,
+            pageSize: pageSize.value,
+          },
+        });
 
         // 遍历需求列表，获取用户信息
-        for (const requirement of response.data) {
+        for (const requirement of response.data.records) {
           // 根据 userid 发起请求获取用户信息
-          const userResponse: AxiosResponse<any> = await axios.get(`http://localhost:80/user/${requirement.userid}`);
+          const userResponse: AxiosResponse<any> = await axios.get(`http://43.143.250.26:80/user/${requirement.userid}`); //http://localhost:80 http://43.143.250.26:80
 
           // 将用户信息添加到 requirement 对象中
           requirement.username = userResponse.data.username;
         }
 
-        requirements.value = response.data;
+        requirements.value = response.data.records;
+        totalPages.value = response.data.pages;
       } catch (error) {
         console.error('Error fetching requirements:', error);
       }
+    };
+
+    // 监听 page 和 pageSize 的变化
+    watch([page, pageSize], () => {
+      fetchData();
     });
 
+    onMounted(fetchData);
+
     return {
+      page,
+      pageSize,
+      totalPages,
       requirements,
       handleCardClick,
     };
@@ -91,8 +127,7 @@ export default defineComponent({
 
 <style scoped>
 .n-card {
-  max-width: 600px;
-  max-height: 300px;
+  width: 600px;
   cursor: pointer;
   border-radius: 10px;
 }
