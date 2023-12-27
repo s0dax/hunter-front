@@ -90,7 +90,6 @@ export default defineComponent({
             pageSize: pageSize.value,
           },
         });
-
         // 遍历需求列表，获取用户信息
         for (const requirement of response.data.records) {
           // 根据 userid 发起请求获取用户信息

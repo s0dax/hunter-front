@@ -12,7 +12,8 @@
     "axios": "^1.6.2",
     "qs": "^6.11.2",
     "vue": "^3.3.11",
-    "vue-router": "^4.2.5"
+    "vue-router": "^4.2.5",
+    "vuex": "^4.0.2"
   },
   "devDependencies": {
     "@types/qs": "^6.9.11",

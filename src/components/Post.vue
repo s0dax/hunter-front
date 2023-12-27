@@ -32,7 +32,7 @@
       </n-space>
       <template #footer>
         <n-space justify="space-between">
-            <n-input placeholder="5" :allow-input="onlyAllowDecimal">
+            <n-input placeholder="金额" :allow-input="onlyAllowDecimal">
                 <template #prefix>
                     <n-icon size="25" color="#F4CB72FF" :component="ReportMoney" />
                 </template>
@@ -52,22 +52,57 @@
   <script lang="ts">
   import { defineComponent, ref } from 'vue'
   import { ReportMoney } from '@vicons/tabler'
+  import axios from 'axios';
   import { UploadFileInfo } from 'naive-ui'
   export default defineComponent({
     setup () {
-        const showModalRef = ref(false)
+        const showPostModal = ref(false)
+        const titleValue = ref("")
+        const value = ref("")
+        const reward = ref(0)
         const previewImageUrlRef = ref('')
-        function handlePreview (file: UploadFileInfo) {
-            const { url } = file
-            previewImageUrlRef.value = url as string
-            showModalRef.value = true
-        }
         const deadLine = ref("一小时")
         const sizeNum = ref(15)
+        const publishRequirement = async () => {
+      try {
+        // 构造要发送的数据对象
+        const postData = {
+          userid: 1, // 填写用户 ID，可以根据你的登录状态获取
+          requireid: 0, // 如果是新增，可以填写 0，如果是修改需求，填写需求的 ID
+          title: titleValue.value,
+          description: value.value,
+          reward: reward.value, // 将字符串转换为浮点数
+          createtime: new Date().toISOString(), // 填写创建时间，这里使用当前时间
+          endtime: '', // 如果有截止时间，填写相应的逻辑获取截止时间
+          status: 'Available', // 根据实际情况填写需求的状态
+          // 其他属性...
+        };
+
+        // 发送 POST 请求到后端接口
+        const response = await axios.post('http://43.143.250.26:80/require', postData);
+
+        // 处理响应，这里可以根据后端返回的数据进行一些逻辑处理
+        console.log('发布成功，返回的数据：', response.data);
+
+        // 关闭模态框
+        showPostModal.value = false;
+
+        // 可以根据后端返回的数据进行一些提示或其他操作
+        // 例如，如果后端返回了新创建的 requirement 的 ID，可以在前端进行一些操作
+        // const newRequirementId = response.data.requireid;
+        // 其他操作...
+      } catch (error) {
+        console.error('发布失败:', error);
+        // 处理错误，例如弹出错误提示
+      }
+    };
     return {
+        titleValue,
+        showPostModal,
+        value,
+        reward,
+        publishRequirement,
         sizeNum,
-        handlePreview,
-        showModal: showModalRef,
         previewImageUrl: previewImageUrlRef,
         deadLine,
         bodyStyle: {
@@ -77,9 +112,6 @@
           content: 'soft',
           footer: 'soft'
         } as const,
-        showPostModal: ref(false),
-        titleValue: ref(null),
-        value: ref(null),
         ReportMoney,
         onlyAllowDecimal: (value: string) => {
         if (!value) return true; // Allow empty input
