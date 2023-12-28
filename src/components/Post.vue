@@ -26,6 +26,7 @@
             action="http://localhost:80/img"
             :default-file-list="fileList"
             list-type="image-card"
+            :default-upload = "defaultUpload"
         >
         点击上传
         </n-upload>
@@ -55,8 +56,11 @@
   import axios from 'axios';
   import { UploadFileInfo } from 'naive-ui'
   import qs from 'qs'
+  import { useMessage } from 'naive-ui'
   export default defineComponent({
     setup () {
+        const message = useMessage()
+        const defaultUpload = ref(false)
         const showPostModal = ref(false)
         const titleValue = ref("")
         const descriptionvalue = ref("")
@@ -67,6 +71,7 @@
         const publishRequirement = async () => {
       try {
         // 从 localStorage 中获取用户信息
+        
         const userInfo = localStorage.getItem('userInfo');
         // 构造要发送的数据对象
         if (userInfo) {
@@ -97,6 +102,8 @@
           } catch (error) {
             console.error('发布失败:', error);
           }
+        } else {
+          message.warning('你还没有登陆')
         }
         // 可以根据后端返回的数据进行一些提示或其他操作
         // 例如，如果后端返回了新创建的 requirement 的 ID，可以在前端进行一些操作
@@ -108,6 +115,7 @@
       }
     };
     return {
+        defaultUpload,
         titleValue,
         showPostModal,
         descriptionvalue,
