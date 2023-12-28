@@ -32,7 +32,7 @@
       </n-space>
       <template #footer>
         <n-space justify="space-between">
-            <n-input placeholder="金额" :allow-input="onlyAllowDecimal">
+            <n-input v-model:value="reward" placeholder="金额" :allow-input="onlyAllowDecimal">
                 <template #prefix>
                     <n-icon size="25" color="#F4CB72FF" :component="ReportMoney" />
                 </template>
@@ -41,7 +41,7 @@
                 </template>
             </n-input>
             <n-select v-model:value="deadLine" :options="options" style="width: 100px;"/>
-            <n-button strong secondary type="primary">
+            <n-button strong secondary type="primary" @click="publishRequirement">
                 发布
             </n-button>
         </n-space>
@@ -59,34 +59,40 @@
         const showPostModal = ref(false)
         const titleValue = ref("")
         const value = ref("")
-        const reward = ref(0)
+        const reward = ref()
         const previewImageUrlRef = ref('')
         const deadLine = ref("一小时")
         const sizeNum = ref(15)
         const publishRequirement = async () => {
       try {
+        // 从 localStorage 中获取用户信息
+        const userInfo = localStorage.getItem('userInfo');
         // 构造要发送的数据对象
-        const postData = {
-          userid: 1, // 填写用户 ID，可以根据你的登录状态获取
-          requireid: 0, // 如果是新增，可以填写 0，如果是修改需求，填写需求的 ID
-          title: titleValue.value,
-          description: value.value,
-          reward: reward.value, // 将字符串转换为浮点数
-          createtime: new Date().toISOString(), // 填写创建时间，这里使用当前时间
-          endtime: '', // 如果有截止时间，填写相应的逻辑获取截止时间
-          status: 'Available', // 根据实际情况填写需求的状态
-          // 其他属性...
+        if (userInfo) {
+          try {
+            const userData = JSON.parse(userInfo);
+            const userId = userData.userid;
+            const postData = {
+              userid: userId, // 填写用户 ID，可以根据你的登录状态获取
+              requireid: 0, // 如果是新增，可以填写 0，如果是修改需求，填写需求的 ID
+              title: titleValue.value,
+              description: value.value,
+              reward: parseFloat(reward.value), // 将字符串转换为浮点数
+              createtime: new Date().toISOString(), // 填写创建时间，这里使用当前时间
+              endtime: '2023-12-28T14:10:34.271Z', // 如果有截止时间，填写相应的逻辑获取截止时间
+              status: 'Available', // 根据实际情况填写需求的状态
+              // 其他属性...
         };
-
-        // 发送 POST 请求到后端接口
-        const response = await axios.post('http://43.143.250.26:80/require', postData);
-
-        // 处理响应，这里可以根据后端返回的数据进行一些逻辑处理
-        console.log('发布成功，返回的数据：', response.data);
-
-        // 关闭模态框
-        showPostModal.value = false;
-
+          // 发送 POST 请求到后端接口
+          const response = await axios.post('http://43.143.250.26:80/require', postData);
+          // 处理响应，这里可以根据后端返回的数据进行一些逻辑处理
+          console.log('发布成功，返回的数据：', response.data);
+          // 关闭模态框
+          showPostModal.value = false;
+          } catch (error) {
+            console.error('发布失败:', error);
+          }
+        }
         // 可以根据后端返回的数据进行一些提示或其他操作
         // 例如，如果后端返回了新创建的 requirement 的 ID，可以在前端进行一些操作
         // const newRequirementId = response.data.requireid;
