@@ -84,7 +84,7 @@ export default defineComponent({
 
     const fetchData = async () => {
       try {
-        const response: AxiosResponse<IPage<Requirement>> = await axios.get(`http://43.143.250.26:80/require/findByCreateTime/`, {
+        const response: AxiosResponse<IPage<Requirement>> = await axios.get(`http://localhost:80/require/findByCreateTime/`, {
           params: {
             pageNum: page.value,
             pageSize: pageSize.value,
@@ -93,7 +93,7 @@ export default defineComponent({
         // 遍历需求列表，获取用户信息
         for (const requirement of response.data.records) {
           // 根据 userid 发起请求获取用户信息
-          const userResponse: AxiosResponse<any> = await axios.get(`http://43.143.250.26:80/user/${requirement.userid}`); //http://localhost:80 http://43.143.250.26:80
+          const userResponse: AxiosResponse<any> = await axios.get(`http://localhost:80/user/${requirement.userid}`); //http://localhost:80 http://43.143.250.26:80
 
           // 将用户信息添加到 requirement 对象中
           requirement.username = userResponse.data.username;

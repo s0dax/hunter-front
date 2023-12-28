@@ -54,6 +54,7 @@
   import { ReportMoney } from '@vicons/tabler'
   import axios from 'axios';
   import { UploadFileInfo } from 'naive-ui'
+  import qs from 'qs'
   export default defineComponent({
     setup () {
         const showPostModal = ref(false)
@@ -72,19 +73,22 @@
           try {
             const userData = JSON.parse(userInfo);
             const userId = userData.userid;
+            console.log(userId)
             const postData = {
               userid: userId, // 填写用户 ID，可以根据你的登录状态获取
               requireid: 0, // 如果是新增，可以填写 0，如果是修改需求，填写需求的 ID
               title: titleValue.value,
               description: value.value,
               reward: parseFloat(reward.value), // 将字符串转换为浮点数
-              createtime: new Date().toISOString(), // 填写创建时间，这里使用当前时间
-              endtime: '2023-12-28T14:10:34.271Z', // 如果有截止时间，填写相应的逻辑获取截止时间
+              createtime: '2023-12-25 23:46:05', // 填写创建时间，这里使用当前时间
+              endtime: '2023-12-26 23:46:05', // 如果有截止时间，填写相应的逻辑获取截止时间
               status: 'Available', // 根据实际情况填写需求的状态
               // 其他属性...
         };
+          console.log("createtime:",postData.createtime)
+          console.log("endtime:",postData.endtime)
           // 发送 POST 请求到后端接口
-          const response = await axios.post('http://43.143.250.26:80/require', postData);
+          const response = await axios.post('http://localhost:80/require', qs.stringify(postData));
           // 处理响应，这里可以根据后端返回的数据进行一些逻辑处理
           console.log('发布成功，返回的数据：', response.data);
           // 关闭模态框
@@ -98,7 +102,7 @@
         // const newRequirementId = response.data.requireid;
         // 其他操作...
       } catch (error) {
-        console.error('发布失败:', error);
+        console.error('没有进入，发布失败:', error);
         // 处理错误，例如弹出错误提示
       }
     };
@@ -126,35 +130,35 @@
       options: [
         {
           label: "一小时",
-          value: 'song0',
+          value: 1,
         },
         {
           label: '两小时',
-          value: 'song1'
+          value: 2
         },
         {
           label: '三小时',
-          value: 'song2'
+          value: 3
         },
         {
           label: "六小时",
-          value: 'song3'
+          value: 4
         },
         {
           label: '一天',
-          value: 'song4'
+          value: 5
         },
         {
           label: '三天',
-          value: 'song5'
+          value: 6
         },
         {
           label: '一周',
-          value: 'song6'
+          value: 7
         },
         {
           label: '一个月',
-          value: 'song7'
+          value: 8
         }
       ],
       fileList: ref<UploadFileInfo[]>([
