@@ -16,14 +16,14 @@
       <n-space vertical :size="sizeNum">
         <n-input v-model:value="titleValue" type="text" placeholder="请输入标题" clearable show-count :maxlength="30"/>
         <n-input
-        v-model:value="value"
+        v-model:value="descriptionvalue"
         type="textarea"
         placeholder="请说明内容"
         clearable
         show-count :maxlength="300"
         />
         <n-upload
-            action="https://www.mocky.io/v2/5e4bafc63100007100d8b70f"
+            action="http://localhost:80/img"
             :default-file-list="fileList"
             list-type="image-card"
         >
@@ -40,7 +40,7 @@
                 元
                 </template>
             </n-input>
-            <n-select v-model:value="deadLine" :options="options" style="width: 100px;"/>
+            <n-select placeholder="有效时间" @update:value="handleUpdateValue" :options="options" style="width: 100px;"/>
             <n-button strong secondary type="primary" @click="publishRequirement">
                 发布
             </n-button>
@@ -59,10 +59,10 @@
     setup () {
         const showPostModal = ref(false)
         const titleValue = ref("")
-        const value = ref("")
+        const descriptionvalue = ref("")
         const reward = ref()
         const previewImageUrlRef = ref('')
-        const deadLine = ref("一小时")
+        const deadLine = ref(1)
         const sizeNum = ref(15)
         const publishRequirement = async () => {
       try {
@@ -73,22 +73,23 @@
           try {
             const userData = JSON.parse(userInfo);
             const userId = userData.userid;
-            console.log(userId)
+            console.log(deadLine.value)
             const postData = {
               userid: userId, // 填写用户 ID，可以根据你的登录状态获取
               requireid: 0, // 如果是新增，可以填写 0，如果是修改需求，填写需求的 ID
               title: titleValue.value,
-              description: value.value,
+              description: descriptionvalue.value,
               reward: parseFloat(reward.value), // 将字符串转换为浮点数
-              createtime: '2023-12-25 23:46:05', // 填写创建时间，这里使用当前时间
-              endtime: '2023-12-26 23:46:05', // 如果有截止时间，填写相应的逻辑获取截止时间
+              createtime: '', // 填写创建时间，这里使用当前时间
+              endtime: '', // 如果有截止时间，填写相应的逻辑获取截止时间
               status: 'Available', // 根据实际情况填写需求的状态
               // 其他属性...
         };
-          console.log("createtime:",postData.createtime)
-          console.log("endtime:",postData.endtime)
+          // console.log("createtime:",postData.createtime)
+          // console.log("endtime:",postData.endtime)
           // 发送 POST 请求到后端接口
-          const response = await axios.post('http://localhost:80/require', qs.stringify(postData));
+          console.log("deadLine:",deadLine.value)
+          const response = await axios.post(`http://localhost:80/requireByLater/${deadLine.value}`, qs.stringify(postData));
           // 处理响应，这里可以根据后端返回的数据进行一些逻辑处理
           console.log('发布成功，返回的数据：', response.data);
           // 关闭模态框
@@ -109,7 +110,7 @@
     return {
         titleValue,
         showPostModal,
-        value,
+        descriptionvalue,
         reward,
         publishRequirement,
         sizeNum,
@@ -127,38 +128,41 @@
         if (!value) return true; // Allow empty input
         return /^\d+(\.\d{0,2})?$/.test(value);
       },
+      handleUpdateValue (value: number) {
+        deadLine.value = value
+      },
       options: [
         {
           label: "一小时",
-          value: 1,
+          value: 60,
         },
         {
           label: '两小时',
-          value: 2
+          value: 120
         },
         {
           label: '三小时',
-          value: 3
+          value: 180
         },
         {
           label: "六小时",
-          value: 4
+          value: 360
         },
         {
           label: '一天',
-          value: 5
+          value: 1440
         },
         {
           label: '三天',
-          value: 6
+          value: 4320
         },
         {
           label: '一周',
-          value: 7
+          value: 10080
         },
         {
           label: '一个月',
-          value: 8
+          value: 43200
         }
       ],
       fileList: ref<UploadFileInfo[]>([
@@ -190,3 +194,4 @@
     }
   })
   </script>
+
