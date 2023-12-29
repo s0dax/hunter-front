@@ -3,10 +3,11 @@
 // import Main from './components/Main.vue'
 // import Table from './components/Table.vue';
 import Navbar from './components/Navbar.vue'
-import Test from './components/Test.vue';
+// import Test from './components/Test.vue';
 // import Search from './components/Search.vue'
 import List from './components/List.vue'
 import Post from './components/Post.vue'
+// import Demo from './components/Demo.vue'
 </script>
 
 <template>
@@ -16,7 +17,7 @@ import Post from './components/Post.vue'
     <h1>
       悬赏平台
     </h1>
-    <Test></Test>
+    <!-- <Test></Test> -->
     <n-message-provider>
       <Post></Post>
     </n-message-provider>

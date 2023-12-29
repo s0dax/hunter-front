@@ -6,7 +6,7 @@
       v-model:show="showPostModal"
       class="custom-card"
       preset="card"
-      :style="bodyStyle"
+      style="width: 600px;"
       title="发布任务"
       size="huge"
       :bordered="false"
@@ -22,14 +22,15 @@
         clearable
         show-count :maxlength="300"
         />
-        <n-upload
-            action="http://localhost:80/img"
-            :default-file-list="fileList"
-            list-type="image-card"
-            :default-upload = "defaultUpload"
-        >
-        点击上传
-        </n-upload>
+        <div>
+          <label class="custom-file-upload">
+          <input type="file" @change="handleFileChange" />
+            上传图片
+          </label>
+          <n-gradient-text type="success">
+            {{image}}
+          </n-gradient-text>
+        </div>
       </n-space>
       <template #footer>
         <n-space justify="space-between">
@@ -42,7 +43,7 @@
                 </template>
             </n-input>
             <n-select placeholder="有效时间" @update:value="handleUpdateValue" :options="options" style="width: 100px;"/>
-            <n-button strong secondary type="primary" @click="publishRequirement">
+            <n-button strong secondary type="primary" @click="publishRequirement" >
                 发布
             </n-button>
         </n-space>
@@ -50,156 +51,130 @@
     </n-modal>
   </template>
   
-  <script lang="ts">
-  import { defineComponent, ref } from 'vue'
-  import { ReportMoney } from '@vicons/tabler'
+  <script setup lang="ts">
+  import { ref } from 'vue';
+  import { ReportMoney } from '@vicons/tabler';
   import axios from 'axios';
-  import { UploadFileInfo } from 'naive-ui'
-  import qs from 'qs'
-  import { useMessage } from 'naive-ui'
-  export default defineComponent({
-    setup () {
-        const message = useMessage()
-        const defaultUpload = ref(false)
-        const showPostModal = ref(false)
-        const titleValue = ref("")
-        const descriptionvalue = ref("")
-        const reward = ref()
-        const previewImageUrlRef = ref('')
-        const deadLine = ref(1)
-        const sizeNum = ref(15)
-        const publishRequirement = async () => {
-      try {
-        // 从 localStorage 中获取用户信息
-        
-        const userInfo = localStorage.getItem('userInfo');
-        // 构造要发送的数据对象
-        if (userInfo) {
-          try {
-            const userData = JSON.parse(userInfo);
-            const userId = userData.userid;
-            console.log(deadLine.value)
-            const postData = {
-              userid: userId, // 填写用户 ID，可以根据你的登录状态获取
-              requireid: 0, // 如果是新增，可以填写 0，如果是修改需求，填写需求的 ID
-              title: titleValue.value,
-              description: descriptionvalue.value,
-              reward: parseFloat(reward.value), // 将字符串转换为浮点数
-              createtime: '', // 填写创建时间，这里使用当前时间
-              endtime: '', // 如果有截止时间，填写相应的逻辑获取截止时间
-              status: 'Available', // 根据实际情况填写需求的状态
-              // 其他属性...
-        };
-          // console.log("createtime:",postData.createtime)
-          // console.log("endtime:",postData.endtime)
-          // 发送 POST 请求到后端接口
-          console.log("deadLine:",deadLine.value)
-          const response = await axios.post(`http://localhost:80/requireByLater/${deadLine.value}`, qs.stringify(postData));
-          // 处理响应，这里可以根据后端返回的数据进行一些逻辑处理
-          console.log('发布成功，返回的数据：', response.data);
-          // 关闭模态框
-          showPostModal.value = false;
-          } catch (error) {
-            console.error('发布失败:', error);
-          }
-        } else {
-          message.warning('你还没有登陆')
-        }
-        // 可以根据后端返回的数据进行一些提示或其他操作
-        // 例如，如果后端返回了新创建的 requirement 的 ID，可以在前端进行一些操作
-        // const newRequirementId = response.data.requireid;
-        // 其他操作...
-      } catch (error) {
-        console.error('没有进入，发布失败:', error);
-        // 处理错误，例如弹出错误提示
-      }
-    };
-    return {
-        defaultUpload,
-        titleValue,
-        showPostModal,
-        descriptionvalue,
-        reward,
-        publishRequirement,
-        sizeNum,
-        previewImageUrl: previewImageUrlRef,
-        deadLine,
-        bodyStyle: {
-          width: '600px'
-        },
-        segmented: {
-          content: 'soft',
-          footer: 'soft'
-        } as const,
-        ReportMoney,
-        onlyAllowDecimal: (value: string) => {
-        if (!value) return true; // Allow empty input
-        return /^\d+(\.\d{0,2})?$/.test(value);
-      },
-      handleUpdateValue (value: number) {
-        deadLine.value = value
-      },
-      options: [
-        {
-          label: "一小时",
-          value: 60,
-        },
-        {
-          label: '两小时',
-          value: 120
-        },
-        {
-          label: '三小时',
-          value: 180
-        },
-        {
-          label: "六小时",
-          value: 360
-        },
-        {
-          label: '一天',
-          value: 1440
-        },
-        {
-          label: '三天',
-          value: 4320
-        },
-        {
-          label: '一周',
-          value: 10080
-        },
-        {
-          label: '一个月',
-          value: 43200
-        }
-      ],
-      fileList: ref<UploadFileInfo[]>([
-        {
-          id: 'a',
-          name: '我是上传出错的普通文件.png',
-          status: 'error'
-        },
-        {
-          id: 'b',
-          name: '我是普通文本.doc',
-          status: 'finished',
-          type: 'text/plain'
-        },
-        {
-          id: 'c',
-          name: '我是自带url的图片.png',
-          status: 'finished',
-          url: 'https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg'
-        },
-        {
-          id: 'd',
-          name: '我是上传进度99%的文本.doc',
-          status: 'uploading',
-          percentage: 99
-        }
-      ]),
-      }
+  import qs from 'qs';
+  import { useMessage } from 'naive-ui';
+  
+  const file = ref<File | null>(null);
+  const message = useMessage();
+  const showPostModal = ref(false);
+  const titleValue = ref("");
+  const descriptionvalue = ref("");
+  const reward = ref();
+  const deadLine = ref<number>(1);
+  const sizeNum = ref(15);
+  const image = ref("")
+  const handleFileChange = (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    if (target.files) {
+      const selectedFile = target.files[0];
+      file.value = selectedFile;
+      console.log(selectedFile.name);
+      image.value=selectedFile.name
     }
-  })
-  </script>
+  };
+  const publishRequirement = async () => {
 
+  
+    try {
+      const userInfo = localStorage.getItem('userInfo');
+      if (userInfo) {
+        const userData = JSON.parse(userInfo);
+        const userId = userData.userid;
+  
+        const postData = {
+          userid: userId,
+          requireid: 0,
+          title: titleValue.value,
+          description: descriptionvalue.value,
+          reward: parseFloat(reward.value),
+          createtime: '',
+          endtime: '',
+          status: 'Available',
+        };
+  
+        const response = await axios.post(`http://43.143.250.26/requireByLater/${deadLine.value}`, qs.stringify(postData));
+        if (file.value) {
+        const formData = new FormData();
+        formData.append('photo', file.value);
+        formData.append('requireid', response.data);
+  
+        try {
+          const response = await axios.post('http://43.143.250.26/img', formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          });
+  
+          console.log('上传成功', response.data);
+        } catch (error) {
+          console.error('上传失败', error);
+        }
+      } else {
+        console.warn('请选择要上传的图片');
+      }
+        console.log('发布成功，返回的数据：', response.data);
+        showPostModal.value = false;
+      } else {
+        message.warning('你还没有登陆');
+      }
+    } catch (error) {
+      console.error('发布失败:', error);
+    }
+  };
+  
+  const onlyAllowDecimal = (value: string) => {
+    if (!value) return true;
+    return /^\d+(\.\d{0,2})?$/.test(value);
+  };
+  
+  const handleUpdateValue = (value: number) => {
+    deadLine.value = value;
+  };
+  
+  const options = [
+    { label: "一小时", value: 60 },
+    { label: '两小时', value: 120 },
+    { label: '三小时', value: 180 },
+    { label: "六小时", value: 360 },
+    { label: '一天', value: 1440 },
+    { label: '三天', value: 4320 },
+    { label: '一周', value: 10080 },
+    { label: '一个月', value: 43200 },
+  ];
+  </script>
+  
+  <style scoped>
+  .custom-file-upload {
+    height: 20px;
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #18a058;
+    background-color: rgba(24, 160, 88, 0.16); /* Naive UI primary color */
+    border: 1px solid rgba(24, 160, 87, 0);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    user-select: none;
+    
+  }
+  
+  .custom-file-upload:hover {
+    background-color: rgba(24, 160, 88, 0.22); /* Naive UI primary color - darker shade */
+  }
+  
+  .button-content {
+    display: inline-block;
+    vertical-align: middle;
+  }
+  
+  /* 隐藏原生的文件上传按钮 */
+  input[type="file"] {
+    display: none;
+  }
+  </style>

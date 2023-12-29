@@ -192,7 +192,7 @@ const handleLogin = async () => {
     });
     //http://localhost:80 http://43.143.250.26:80
     // 发送登录请求到后端
-    const response = await axios.post('http://localhost:80/login', requestData, {
+    const response = await axios.post('http://43.143.250.26/login', requestData, {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded', // 设置请求头为表单数据格式
       },
@@ -202,7 +202,7 @@ const handleLogin = async () => {
     if (response.data) {
       // 登录成功，可以保存用户登录状态，执行跳转等操作
       console.log('登录成功');
-      const userInfoResponse = await axios.get(`http://localhost:80/user/${userid.value}`);
+      const userInfoResponse = await axios.get(`http://43.143.250.26/user/${userid.value}`);
       // 保存用户信息到localStorage
       localStorage.setItem('userInfo', JSON.stringify({
         userid: Number(userid.value),

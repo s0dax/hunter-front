@@ -1,57 +1,52 @@
 <template>
-  <h3>后台首页</h3>
-  <el-form :model="formData">
-      <el-form-item label="书籍封面:" label-width="100">
-          <el-upload
-                  :http-request="httpRequest"
-                  multiple
-                  :show-file-list="true"
-                  list-type="picture-card"
-          ><el-icon><Plus /></el-icon>
-          </el-upload>
-      </el-form-item>
-      <div>
-          <el-button>取消</el-button>
-          <el-button type="primary" @click="onBtn">添加</el-button>
-      </div>
-  </el-form>
-  <form action="/upload">
-    <input type="file" name="file"/>
-    <input type="submit" value="Upload"/>
-  </form>
+  <div>
+    <input type="file" @change="handleFileChange" />
+    <button @click="uploadImage">上传图片</button>
+  </div>
 </template>
 
-<script setup>
-import {ref, reactive} from "vue";
-import axios from "axios";
-import { Plus } from '@element-plus/icons-vue'
+<script setup lang="ts">
+import axios from 'axios';
 
+const handleFileChange = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  if (target.files) {
+    // 获取选择的文件
+    const file = target.files[0];
+    // 将文件存储在组件状态中，以备上传时使用
+    // 可以使用 ref 或者其他状态管理方式
+    // 这里简化为直接在组件内部存储
+    componentState.file = file;
+  }
+};
 
-//定义一个响应式数组用来接收图片
-const fileList = ref([])
-const id = ref(1)
-//自定义函数用来覆盖原有的XHR行为（默认提交行为）
-function httpRequest(option) {
-//将图片存到数组中
-  fileList.value.push(option)
-}
+const uploadImage = async () => {
+  if (componentState.file) {
+    const formData = new FormData();
+    formData.append('photo', componentState.file);
+    formData.append('requireid','1');
+    console.log(componentState.file)
+    try {
+      // 发送POST请求到后端
+      const response = await axios.post('http://localhost:80/img', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
 
-async function onBtn() {
-  let dataForm = new FormData();
+      // 处理后端返回的数据
+      console.log('上传成功', response.data);
+    } catch (error) {
+      // 处理上传失败的情况
+      console.error('上传失败', error);
+    }
+  } else {
+    console.warn('请选择要上传的图片');
+  }
+};
 
-//将图片的二进制通过表单的形式发送到后台
-  fileList.value.forEach((it,index)=>{
-      dataForm.append('filename',it.file)
-  })
-  const response = await axios.post('http://localhost:80/img', dataForm, {
-    params: {
-      requireid: id.value,
-    },
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  });
-
-  console.log(response.data);
-}
+// 组件内部状态
+const componentState = {
+  file: null as File | null,
+};
 </script>
