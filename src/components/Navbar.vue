@@ -57,8 +57,8 @@
     >
       <n-tab-pane name="signin" tab="登录">
         <n-form>
-          <n-form-item-row label="用户名">
-            <n-input v-model:value="userid" placeholder="请输入用户名"/>
+          <n-form-item-row label="邮箱/账号">
+            <n-input v-model:value="userid" placeholder="请输入邮箱或账号"/>
           </n-form-item-row>
           <n-form-item-row label="密码">
             <n-input
@@ -85,7 +85,7 @@
       <n-form
         ref="formRef" :model="model" :rules="rules"
       >
-          <n-form-item-row label="用户名" path="username">
+          <n-form-item-row label="邮箱" path="username">
             <n-input :maxlength="10" placeholder="请输入用户名" v-model:value="model.username" @keydown.enter.prevent/>
           </n-form-item-row>
           <n-form-item-row label="密码" path="password">
@@ -137,7 +137,7 @@
               placeholder="请输入邮箱地址"
             >
             <template #suffix>
-                <n-button @click="handleValidateButtonClick"></n-button>
+                <n-button style="width: 100px;" type="success" strong secondary @click="handleValidateButtonClick">发送验证码</n-button>
             </template>
             </n-auto-complete>
           <!-- </n-input> -->
@@ -280,7 +280,7 @@ const handleValidateButtonClick = (e: MouseEvent) => {
   formRef.value?.validate((errors) => {
     if (!errors) {
       handleVerify()
-      message.success('所有信息都已填写')
+      message.success('验证码已发送')
     } else {
       message.error('发送失败')
     }
