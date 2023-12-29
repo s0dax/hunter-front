@@ -10,6 +10,7 @@
       title="发布任务"
       size="huge"
       :bordered="false"
+      :on-after-leave="handleAfterLeave"
     >
       <template #header-extra>
       </template>
@@ -67,6 +68,11 @@
   const deadLine = ref<number>(1);
   const sizeNum = ref(15);
   const image = ref("")
+  const handleAfterLeave = (): void => {
+  // 在模态框关闭后触发的回调函数
+  console.log('Modal 关闭后执行的操作');
+  // 在这里可以执行你希望在模态框关闭后进行的操作
+};
   const handleFileChange = (event: Event) => {
     const target = event.target as HTMLInputElement;
     if (target.files) {

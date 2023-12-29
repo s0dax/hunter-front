@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
   <div>
     <input type="file" @change="handleFileChange" />
     <button @click="uploadImage">上传图片</button>
@@ -49,4 +49,4 @@ const uploadImage = async () => {
 const componentState = {
   file: null as File | null,
 };
-</script>
+</script> -->

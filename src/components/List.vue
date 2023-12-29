@@ -21,10 +21,11 @@
         </div>
       </template>
       <template #footer>
-        <div style="display: flex; justify-content: flex-end;">
+        <div style="display: flex; justify-content: flex-start;">
           <n-tag :bordered="false" type="warning" size="large" :round="true" style="font-weight: bold;">
             {{ requirement.reward }}元
           </n-tag>
+          <n-time :time="0" :to="14400000" type="relative" />
         </div>
       </template>
       {{ requirement.description }}
