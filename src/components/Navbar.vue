@@ -82,17 +82,40 @@
         </n-button>
       </n-tab-pane>
       <n-tab-pane name="signup" tab="注册">
-        <n-form>
-          <n-form-item-row label="用户名">
-            <n-input placeholder="请输入用户名"/>
+      <n-form
+        ref="formRef" :model="model" :rules="rules"
+      >
+          <n-form-item-row label="用户名" path="username">
+            <n-input :maxlength="10" placeholder="请输入用户名" v-model:value="model.username" @keydown.enter.prevent/>
           </n-form-item-row>
-          <n-form-item-row label="密码">
+          <n-form-item-row label="密码" path="password">
             <n-input
-      type="password"
-      show-password-on="click"
-      placeholder="请输入密码"
-      :maxlength="8"
-    >
+              type="password"
+              v-model:value="model.password"
+              show-password-on="click"
+              placeholder="请输入密码"
+              :maxlength="16"
+              @input="handlePasswordInput"
+              @keydown.enter.prevent
+            >
+      <template #password-visible-icon>
+        <n-icon :size="16" :component="GlassesOutline" />
+      </template>
+      <template #password-invisible-icon>
+        <n-icon :size="16" :component="Glasses" />
+      </template>
+    </n-input>
+          </n-form-item-row >
+          <n-form-item-row first label="重复密码" ref="rPasswordFormItemRef" path="reenteredPassword">
+            <n-input
+              v-model:value="model.reenteredPassword"
+              :disabled="!model.password"
+              @keydown.enter.prevent
+              type="password"
+              show-password-on="click"
+              placeholder="请输入密码"
+              :maxlength="16"
+            >
       <template #password-visible-icon>
         <n-icon :size="16" :component="GlassesOutline" />
       </template>
@@ -101,23 +124,35 @@
       </template>
     </n-input>
           </n-form-item-row>
-          <n-form-item-row label="重复密码">
-            <n-input
-      type="password"
-      show-password-on="click"
-      placeholder="请输入密码"
-      :maxlength="8"
-    >
-      <template #password-visible-icon>
-        <n-icon :size="16" :component="GlassesOutline" />
-      </template>
-      <template #password-invisible-icon>
-        <n-icon :size="16" :component="Glasses" />
-      </template>
-    </n-input>
+          <n-form-item-row label="邮箱地址" path="mallAddress">
+            <!-- <n-input
+              @keydown.enter.prevent
+              placeholder="请输入邮箱地址"
+              v-model:value="model.mallAddress"
+            > -->
+            <n-auto-complete
+              v-model:value="model.mallAddress"
+              @keydown.enter.prevent
+              :options="mallOptions"
+              placeholder="请输入邮箱地址"
+            >
+            <template #suffix>
+                <n-button @click="handleValidateButtonClick"></n-button>
+            </template>
+            </n-auto-complete>
+          <!-- </n-input> -->
+          </n-form-item-row>
+          <n-form-item-row label="专业" path="code">
+            <n-input v-model:value="model.department" placeholder="请输入专业"/>
+          </n-form-item-row>
+          <n-form-item-row label="年级" path="code">
+            <n-input v-model:value="model.semester" placeholder="请输入年级"/>
+          </n-form-item-row>
+          <n-form-item-row label="验证码" path="code">
+            <n-input v-model:value="model.code" placeholder="请输入验证码"/>
           </n-form-item-row>
         </n-form>
-        <n-button type="primary" block secondary strong>
+        <n-button type="primary" block secondary strong @click="handleSignin">
           注册
         </n-button>
       </n-tab-pane>
@@ -127,8 +162,8 @@
 
 <script setup lang="ts">
 import qs from 'qs'
-import { ref,h } from 'vue';
-import { NIcon } from 'naive-ui';
+import { ref,h,computed } from 'vue';
+import { useMessage, NIcon,FormInst,FormItemInst,FormItemRule,FormRules } from 'naive-ui';
 import {
   PersonCircleOutline as UserIcon,
   Pencil as EditIcon,
@@ -138,6 +173,119 @@ import Search from './Search.vue'
 import { GlassesOutline, Glasses } from '@vicons/ionicons5'
 import axios from 'axios';
 
+interface ModelType {
+  username: string | null
+  password: string | null
+  reenteredPassword: string | null
+  mallAddress: string
+  code: string | null
+  department: string | null
+  semester: string | null
+}
+const model = ref<ModelType>({
+      username: null,
+      password: null,
+      reenteredPassword: null,
+      mallAddress: "",
+      code: null,
+      department: null,
+      semester: null
+})
+const verifyId = ref(0)
+const message = useMessage()
+const formRef = ref<FormInst | null>(null)
+const rPasswordFormItemRef = ref<FormItemInst | null>(null)
+function validatePasswordStartWith (
+    rule: FormItemRule,
+    value: string
+  ): boolean {
+    return (
+      !!model.value.password &&
+      model.value.password.startsWith(value) &&
+      model.value.password.length >= value.length
+    )
+  }
+
+function validatePasswordSame (rule: FormItemRule, value: string): boolean {
+    return value === model.value.password
+  }
+const rules: FormRules = {
+      username: [
+        {
+          required: true,
+          validator (rule: FormItemRule, value: string) {
+            if (!value) {
+              return new Error('需要用户名')
+            } 
+            return true
+          },
+          trigger: ['input', 'blur']
+        }
+      ],
+      password: [
+        {
+          required: true,
+          message: '请输入密码'
+        }
+      ],
+      reenteredPassword: [
+        {
+          required: true,
+          message: '请再次输入密码',
+          trigger: ['input', 'blur']
+        },
+        {
+          validator: validatePasswordStartWith,
+          message: '两次密码输入不一致',
+          trigger: 'input'
+        },
+        {
+          validator: validatePasswordSame,
+          message: '两次密码输入不一致',
+          trigger: ['blur', 'password-input']
+        }
+      ],
+      mallAddress: [
+        {
+          required: true,
+          message: '请输入邮箱',
+          trigger: 'blur'
+        }
+      ],
+      code: [
+        {
+          required: false,
+          message: '请输入验证码'
+        }
+      ],
+      department: [
+        {
+          required: false,
+        }
+      ],
+      semester: [
+        {
+          required: false,
+        }
+      ]
+  }
+  const handlePasswordInput = () => {
+  if (model.value.reenteredPassword) {
+    rPasswordFormItemRef.value?.validate({ trigger: 'password-input' })
+  }
+}
+
+const handleValidateButtonClick = (e: MouseEvent) => {
+  e.preventDefault()
+  formRef.value?.validate((errors) => {
+    if (!errors) {
+      handleVerify()
+      message.success('所有信息都已填写')
+    } else {
+      message.error('发送失败')
+    }
+  })
+}
 const renderIcon = (icon: any) => () => h(NIcon, null, { default: () => h(icon) });
 const isLoggedIn = ref(false);
 const userid = ref('')
@@ -159,6 +307,17 @@ const options = [
     icon: renderIcon(LogoutIcon),
   }
 ];
+
+const mallOptions = computed(() => [
+  ['谷歌', '@gmail.com'],
+  ['网易', '@163.com'],
+  ['腾讯', '@qq.com']
+].map((emailInfo) => ({
+  type: 'group',
+  label: emailInfo[0],
+  key: emailInfo[0],
+  children: [model.value.mallAddress.split('@')[0] + emailInfo[1]]
+})));
 const handleSelect = (key: string | number) => {
   //message.info(String(key));
   console.log(key);
@@ -187,12 +346,12 @@ const handleLogin = async () => {
   try {
     // 使用qs.stringify将数据转换为适合发送给后端的格式
     const requestData = qs.stringify({
-      userid: Number(userid.value),
+      IdOrMailAddress: userid.value,
       password: password.value,
     });
     //http://localhost:80 http://43.143.250.26:80
     // 发送登录请求到后端
-    const response = await axios.post('http://43.143.250.26/login', requestData, {
+    const response = await axios.post('http://localhost:80/login', requestData, {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded', // 设置请求头为表单数据格式
       },
@@ -202,10 +361,10 @@ const handleLogin = async () => {
     if (response.data) {
       // 登录成功，可以保存用户登录状态，执行跳转等操作
       console.log('登录成功');
-      const userInfoResponse = await axios.get(`http://43.143.250.26/user/${userid.value}`);
+      const userInfoResponse = await axios.get(`http://localhost:80/user/${response.data}`);
       // 保存用户信息到localStorage
       localStorage.setItem('userInfo', JSON.stringify({
-        userid: Number(userid.value),
+        userid: Number(response.data),
         username: userInfoResponse.data.username,
         // 其他用户信息...
       }));
@@ -218,6 +377,84 @@ const handleLogin = async () => {
     }
   } catch (error) {
     console.error('登录出错：', error);
+  } finally {
+    // 关闭模态框
+    //showModal.value = false;
+  }
+};
+const handleSignin = async () => {
+  console.log("注册点击")
+  console.log("verifyId",verifyId)
+  console.log("userInputCode",model.value.code)
+  try {
+    // 使用qs.stringify将数据转换为适合发送给后端的格式
+    const formData = qs.stringify({
+      username: model.value.username,
+      password: model.value.password,
+      userdepartment: model.value.department,
+      usersemester: model.value.semester,
+      verifyId: verifyId.value,
+      userInputCode: model.value.code,
+    });
+    //http://localhost:80 http://43.143.250.26:80
+    // 发送登录请求到后端
+    const response = await axios.post('http://localhost:80/user/verify',formData,{
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+});
+
+    // 根据后端返回的数据处理登录结果
+    if (response.data) {
+      console.log('注册成功');
+      const userInfoResponse = await axios.get(`http://43.143.250.26/user/${response.data}`);
+      // // 保存用户信息到localStorage
+      localStorage.setItem('userInfo', JSON.stringify({
+        userid: Number(response.data),
+        username: userInfoResponse.data.username,
+        // 其他用户信息...
+      }));
+      // console.log(response.data.username)
+      isLoggedIn.value = true;
+      showModal.value = false;
+    } else {
+      // 注册失败
+      console.log('注册失败');
+    }
+  } catch (error) {
+    console.error('注册出错：', error);
+  } finally {
+    // 关闭模态框
+    //showModal.value = false;
+  }
+};
+const handleVerify = async () => {
+  console.log("验证点击")
+  
+  try {
+    // 使用qs.stringify将数据转换为适合发送给后端的格式
+    //http://localhost:80 http://43.143.250.26:80
+    const formData = new FormData();
+    console.log(formData);
+    formData.append('userMailAddress', model.value.mallAddress);
+    const response = await axios.post('http://localhost:80/user',formData, {
+      headers: {
+              'Content-Type': 'multipart/form-data',
+      },
+    });
+
+    // 根据后端返回的数据处理登录结果
+    if (response.data) {
+      // 登录成功，可以保存用户登录状态，执行跳转等操作
+      console.log('验证码发送成功');
+      console.log(response.data)
+      verifyId.value = response.data
+    } else {
+      // 登录失败，可以给用户提供相应的提示信息
+      console.log('没有获得返回值');
+    }
+  } catch (error) {
+    console.error('注册出错：', error);
   } finally {
     // 关闭模态框
     //showModal.value = false;

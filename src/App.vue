@@ -14,7 +14,9 @@ import { zhCN,dateZhCN } from "naive-ui";
 <template>
   <n-config-provider :locale="zhCN" :date-locale="dateZhCN">
     <div id="app">
-    <Navbar></Navbar>
+    <n-message-provider>
+      <Navbar></Navbar>
+    </n-message-provider>
     <div id="title">
     <h1>
       悬赏平台
