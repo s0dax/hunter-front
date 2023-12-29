@@ -8,9 +8,11 @@ import Navbar from './components/Navbar.vue'
 import List from './components/List.vue'
 import Post from './components/Post.vue'
 // import Demo from './components/Demo.vue'
+import { zhCN,dateZhCN } from "naive-ui";
 </script>
 
 <template>
+  <n-config-provider :locale="zhCN" :date-locale="dateZhCN">
     <div id="app">
     <Navbar></Navbar>
     <div id="title">
@@ -24,6 +26,7 @@ import Post from './components/Post.vue'
     </div>
     <List></List>
   </div>
+  </n-config-provider>
 </template>
 
 <style scoped>

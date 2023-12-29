@@ -21,12 +21,16 @@
         </div>
       </template>
       <template #footer>
-        <div style="display: flex; justify-content: flex-start;">
-          <n-tag :bordered="false" type="warning" size="large" :round="true" style="font-weight: bold;">
+
+          <n-space justify="space-between" :wrap-item="false">
+            <n-tag :bordered="false" type="warning" size="large" :round="true" style="font-weight: bold;">
             {{ requirement.reward }}元
           </n-tag>
-          <n-time :time="0" :to="14400000" type="relative" />
-        </div>
+          <div style="height: 10px;">
+            <n-time :time="0" :to="requirement.createtime" type="relative"/>
+          </div>
+          </n-space>
+
       </template>
       {{ requirement.description }}
     </n-card>
@@ -57,7 +61,7 @@ interface Requirement {
   title: string;
   description: string;
   reward: string;
-  createtime: string;
+  createtime: number;
   endtime: string;
   status: string;
   // 新增用户信息
@@ -78,9 +82,16 @@ export default defineComponent({
     const page = ref(1);
     const pageSize = ref(10);
     const totalPages = ref(0);
-
     const handleCardClick = (requirement: Requirement) => {
       console.log('卡片被点击了！', requirement);
+      const now = new Date();
+
+  // 将未来日期字符串转换为日期对象
+  const future = new Date('2023-12-29 23:50:45');
+
+  // 计算毫秒差异
+  const timeDifference = future.getTime() - now.getTime();
+  console.log(timeDifference);
     };
 
     const fetchData = async () => {
@@ -95,9 +106,13 @@ export default defineComponent({
         for (const requirement of response.data.records) {
           // 根据 userid 发起请求获取用户信息
           const userResponse: AxiosResponse<any> = await axios.get(`http://43.143.250.26/user/${requirement.userid}`); //http://localhost:80 http://43.143.250.26:80
-
+          
           // 将用户信息添加到 requirement 对象中
           requirement.username = userResponse.data.username;
+          const create = new Date(requirement.createtime);
+          const now = new Date();
+          const timeDifference = now.getTime() - create.getTime();
+          requirement.createtime = timeDifference
         }
 
         requirements.value = response.data.records;
