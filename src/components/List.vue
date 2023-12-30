@@ -13,8 +13,9 @@
         <div style="height:80px; width: 100px; text-align: right;">
         <n-space vertical>
           <n-avatar
+            color="#FFFFFF00"
             :size="58"
-            src="https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg"
+            :src="requirement.endtime"
           />
           {{ requirement.username }}
         </n-space>
@@ -32,7 +33,11 @@
           </n-space>
 
       </template>
-      {{ requirement.description }}
+      <div>
+        {{ requirement.description }}
+      </div>
+
+      <img v-for="image in requirement.img" width="515" :src="'http://43.143.250.26/requires/'+requirement.requireid + '/' + image.imgpath">
     </n-card>
     <n-pagination
     size="large"
@@ -54,7 +59,7 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted, watch } from 'vue';
 import axios, { AxiosResponse } from 'axios';
-
+import qs from 'qs'
 interface Requirement {
   userid: number;
   requireid: number;
@@ -66,6 +71,12 @@ interface Requirement {
   status: string;
   // 新增用户信息
   username: string;
+  img: Array<{
+    imgid: number;
+    requireid: number;
+    imgpath: string;
+    imgrealpath: string;
+  }>;
 }
 
 interface IPage<T> {
@@ -88,7 +99,6 @@ export default defineComponent({
 
   // 将未来日期字符串转换为日期对象
   const future = new Date('2023-12-29 23:50:45');
-
   // 计算毫秒差异
   const timeDifference = future.getTime() - now.getTime();
   console.log(timeDifference);
@@ -106,9 +116,16 @@ export default defineComponent({
         for (const requirement of response.data.records) {
           // 根据 userid 发起请求获取用户信息
           const userResponse: AxiosResponse<any> = await axios.get(`http://43.143.250.26/user/${requirement.userid}`); //http://localhost:80 http://43.143.250.26:80
-          
+          const formData = qs.stringify({
+            userid: requirement.userid
+          })
+          const userImgResponse = await axios.get(`http://localhost:80/img/profilePic?${formData}`);
+          const reuqireImgResponse = await axios.get(`http://localhost:80/require/${requirement.requireid}/img`);
+          requirement.img = reuqireImgResponse.data
+          console.log(reuqireImgResponse.data[0])
           // 将用户信息添加到 requirement 对象中
           requirement.username = userResponse.data.username;
+          requirement.endtime = 'http://43.143.250.26/defaultProfilePic/'+userImgResponse.data.userimgpath
           const create = new Date(requirement.createtime);
           const now = new Date();
           const timeDifference = now.getTime() - create.getTime();

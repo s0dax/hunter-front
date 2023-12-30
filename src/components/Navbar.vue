@@ -27,8 +27,9 @@
         <n-dropdown :options="options" @select="handleSelect">
           
             <n-avatar
-            size="medium"
-            src="https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg"
+            color="#FFFFFF00"
+            size="large"
+            :src="getUserImg()"
           />
           
         </n-dropdown>
@@ -85,7 +86,7 @@
       <n-form
         ref="formRef" :model="model" :rules="rules"
       >
-          <n-form-item-row label="邮箱" path="username">
+          <n-form-item-row label="用户名" path="username">
             <n-input :maxlength="10" placeholder="请输入用户名" v-model:value="model.username" @keydown.enter.prevent/>
           </n-form-item-row>
           <n-form-item-row label="密码" path="password">
@@ -191,6 +192,7 @@ const model = ref<ModelType>({
       department: null,
       semester: null
 })
+const img = ref('')
 const verifyId = ref(0)
 const message = useMessage()
 const formRef = ref<FormInst | null>(null)
@@ -362,10 +364,16 @@ const handleLogin = async () => {
       // 登录成功，可以保存用户登录状态，执行跳转等操作
       console.log('登录成功');
       const userInfoResponse = await axios.get(`http://localhost:80/user/${response.data}`);
+      const formData = qs.stringify({
+        userid: response.data
+      })
+      const userImgResponse = await axios.get(`http://localhost:80/img/profilePic?${formData}`);
+      console.log("imgSrc:",userImgResponse.data.userimgpath)
       // 保存用户信息到localStorage
       localStorage.setItem('userInfo', JSON.stringify({
         userid: Number(response.data),
         username: userInfoResponse.data.username,
+        userImg: userImgResponse.data.userimgpath
         // 其他用户信息...
       }));
       console.log(response.data.username)
@@ -409,9 +417,14 @@ const handleSignin = async () => {
       console.log('注册成功');
       const userInfoResponse = await axios.get(`http://43.143.250.26/user/${response.data}`);
       // // 保存用户信息到localStorage
+      const formData = qs.stringify({
+        userid: response.data
+      })
+      const userImgResponse = await axios.get(`http://localhost:80/img/profilePic?${formData}`);
       localStorage.setItem('userInfo', JSON.stringify({
         userid: Number(response.data),
         username: userInfoResponse.data.username,
+        userImg: userImgResponse.data.userimgpath
         // 其他用户信息...
       }));
       // console.log(response.data.username)
@@ -472,6 +485,15 @@ const getUsername = () => {
   if (userInfo) {
     const { username } = JSON.parse(userInfo);
     return username;
+  }
+  return '';
+};
+const getUserImg = () => {
+  const userInfo = localStorage.getItem('userInfo');
+  if (userInfo) {
+    const { userImg } = JSON.parse(userInfo);
+    const url = 'http://43.143.250.26/defaultProfilePic/'
+    return url + userImg;
   }
   return '';
 };
