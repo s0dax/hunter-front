@@ -13,9 +13,10 @@ import { ref, provide } from 'vue';
 import { darkTheme } from 'naive-ui'
 import type { GlobalTheme } from 'naive-ui'
 const theme = ref<GlobalTheme | null>(null)
-// theme.value = darkTheme
+theme.value = theme.value
 const keyWord = ref('');
 provide('keyWord', keyWord);
+provide('theme',theme)
 </script>
 
 <template>

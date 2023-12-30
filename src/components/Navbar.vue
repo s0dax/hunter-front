@@ -3,9 +3,11 @@
     <div class="nav-left" style="width: 100px;">
       <!-- 导航栏左侧内容 -->
       <n-space justify="space-around" :wrap="false">
-        <n-button text @click="handleButtonClick('home')" class="nav-button">首页</n-button>
         <!-- <n-button text @click="handleButtonClick('about')" class="nav-button">关于</n-button> -->
         <n-button text @click="handleButtonClick('contact')" class="nav-button">联系我们</n-button>
+        <n-button text @click="changetheme">
+		      {{ themebtntit }}
+        </n-button>
       </n-space>
       
     </div>
@@ -167,6 +169,7 @@
 </template>
 
 <script setup lang="ts">
+import { darkTheme } from "naive-ui";
 import { inject } from 'vue';
 import qs from 'qs'
 import { ref,h,computed } from 'vue';
@@ -198,13 +201,18 @@ const model = ref<ModelType>({
       department: null,
       semester: null
 })
+const themebtntit = ref("暗色");
 const keyWord = inject<any>('keyWord')
-// keyWord.value = inject('keyWord')
+const theme = inject<any>('theme')
 const keyWordValue = ref('')
 const verifyId = ref(0)
 const message = useMessage()
 const formRef = ref<FormInst | null>(null)
 const rPasswordFormItemRef = ref<FormItemInst | null>(null)
+  const changetheme = () => {
+  theme.value = theme.value == null ? darkTheme : null;
+  themebtntit.value = themebtntit.value == "亮色" ? "暗色" : "亮色";
+};
 function validatePasswordStartWith (
     _rule: FormItemRule,
     value: string
