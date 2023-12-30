@@ -9,7 +9,12 @@
       </n-space>
       
     </div>
-    <Search></Search>
+    <div class="search-container">
+        <n-input clearable :onClear="handleClear" size="large" round v-model:value="keyWordValue" placeholder="搜索" style="max-width: 70%;"/>
+        <n-button size = "large" round type="primary" @click="clickSearch">
+            <n-icon><search /></n-icon>
+        </n-button>
+    </div>
     <div class="nav-right">
       <!-- 导航栏右侧内容，包括登录注册和用户头像下拉菜单 -->
       <template v-if="!isLoggedIn">
@@ -162,6 +167,7 @@
 </template>
 
 <script setup lang="ts">
+import { inject } from 'vue';
 import qs from 'qs'
 import { ref,h,computed } from 'vue';
 import { useMessage, NIcon,FormInst,FormItemInst,FormItemRule,FormRules } from 'naive-ui';
@@ -170,9 +176,9 @@ import {
   Pencil as EditIcon,
   LogOutOutline as LogoutIcon,
 } from '@vicons/ionicons5';
-import Search from './Search.vue'
 import { GlassesOutline, Glasses } from '@vicons/ionicons5'
 import axios from 'axios';
+import { Search } from '@vicons/ionicons5'
 
 interface ModelType {
   username: string | null
@@ -192,7 +198,9 @@ const model = ref<ModelType>({
       department: null,
       semester: null
 })
-const img = ref('')
+const keyWord = inject('keyWord')
+// keyWord.value = inject('keyWord')
+const keyWordValue = ref('')
 const verifyId = ref(0)
 const message = useMessage()
 const formRef = ref<FormInst | null>(null)
@@ -277,6 +285,12 @@ const rules: FormRules = {
   }
 }
 
+const clickSearch = () => {
+  keyWord.value = keyWordValue.value
+}
+const handleClear = () => {
+  keyWord.value = ''
+};
 const handleValidateButtonClick = (e: MouseEvent) => {
   e.preventDefault()
   formRef.value?.validate((errors) => {
@@ -526,5 +540,12 @@ const getUserImg = () => {
   cursor: pointer;
   font-size: 16px;
   padding: 10px;
+}
+
+.search-container {
+  min-width: 60%;
+  display: flex;
+  align-items: center; /* 垂直居中 */
+  justify-content: center;
 }
 </style>

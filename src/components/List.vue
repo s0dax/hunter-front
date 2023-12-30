@@ -45,7 +45,7 @@
     v-model:page-size="pageSize"
     v-model:page-count="totalPages"
     show-size-picker
-    :page-sizes="[10, 20, 30]"
+    :page-sizes="[5, 10, 20, 30]"
     style="margin-bottom: 20px;margin-top: 10px;"
   />
     <!-- <n-card title="卡片" hoverable>
@@ -60,6 +60,7 @@
 import { defineComponent, ref, onMounted, watch } from 'vue';
 import axios, { AxiosResponse } from 'axios';
 import qs from 'qs'
+import { inject } from 'vue';
 interface Requirement {
   userid: number;
   requireid: number;
@@ -89,6 +90,7 @@ interface IPage<T> {
 
 export default defineComponent({
   setup() {
+    const keyWord = inject('keyWord')
     const requirements = ref<Requirement[]>([]);
     const page = ref(1);
     const pageSize = ref(10);
@@ -106,12 +108,16 @@ export default defineComponent({
 
     const fetchData = async () => {
       try {
-        const response: AxiosResponse<IPage<Requirement>> = await axios.get(`http://43.143.250.26/require/findByCreateTime/`, {
+        const response: AxiosResponse<IPage<Requirement>> = await axios.get(`http://localhost:80/search/require`, {
           params: {
+            keyword: keyWord.value,
             pageNum: page.value,
             pageSize: pageSize.value,
           },
         });
+        if(!response.data) {
+          
+        }
         // 遍历需求列表，获取用户信息
         for (const requirement of response.data.records) {
           // 根据 userid 发起请求获取用户信息
@@ -122,7 +128,6 @@ export default defineComponent({
           const userImgResponse = await axios.get(`http://localhost:80/img/profilePic?${formData}`);
           const reuqireImgResponse = await axios.get(`http://localhost:80/require/${requirement.requireid}/img`);
           requirement.img = reuqireImgResponse.data
-          console.log(reuqireImgResponse.data[0])
           // 将用户信息添加到 requirement 对象中
           requirement.username = userResponse.data.username;
           requirement.endtime = 'http://43.143.250.26/defaultProfilePic/'+userImgResponse.data.userimgpath
@@ -134,19 +139,58 @@ export default defineComponent({
 
         requirements.value = response.data.records;
         totalPages.value = response.data.pages;
+
       } catch (error) {
         console.error('Error fetching requirements:', error);
       }
     };
+    const fetchDataSearch = async () => {
+      try {
+        const response: AxiosResponse<IPage<Requirement>> = await axios.get(`http://localhost:80/search/require`, {
+          params: {
+            keyword: keyWord.value,
+          },
+        });
+        if(!response.data) {
+          
+        }
+        // 遍历需求列表，获取用户信息
+        for (const requirement of response.data.records) {
+          // 根据 userid 发起请求获取用户信息
+          const userResponse: AxiosResponse<any> = await axios.get(`http://43.143.250.26/user/${requirement.userid}`); //http://localhost:80 http://43.143.250.26:80
+          const formData = qs.stringify({
+            userid: requirement.userid
+          })
+          const userImgResponse = await axios.get(`http://localhost:80/img/profilePic?${formData}`);
+          const reuqireImgResponse = await axios.get(`http://localhost:80/require/${requirement.requireid}/img`);
+          requirement.img = reuqireImgResponse.data
+          // 将用户信息添加到 requirement 对象中
+          requirement.username = userResponse.data.username;
+          requirement.endtime = 'http://43.143.250.26/defaultProfilePic/'+userImgResponse.data.userimgpath
+          const create = new Date(requirement.createtime);
+          const now = new Date();
+          const timeDifference = now.getTime() - create.getTime();
+          requirement.createtime = timeDifference
+        }
 
+        requirements.value = response.data.records;
+        totalPages.value = response.data.pages;
+
+      } catch (error) {
+        console.error('Error fetching requirements:', error);
+      }
+    };
     // 监听 page 和 pageSize 的变化
-    watch([page, pageSize], () => {
+    watch([page, pageSize, keyWord], () => {
       fetchData();
     });
-
+    watch([keyWord], () => {
+      fetchDataSearch();
+    });
     onMounted(fetchData);
 
     return {
+      keyWord,
       page,
       pageSize,
       totalPages,

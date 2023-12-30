@@ -9,12 +9,10 @@ import List from './components/List.vue'
 import Post from './components/Post.vue'
 // import Demo from './components/Demo.vue'
 import { zhCN,dateZhCN } from "naive-ui";
+import { ref, provide } from 'vue';
 
-const searchKeyword = ref('');
-
-const search = (keyword) => {
-  searchKeyword.value = keyword;
-};
+const keyWord = ref('');
+provide('keyWord', keyWord);
 </script>
 
 <template>
