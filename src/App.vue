@@ -6,11 +6,9 @@ import Navbar from './components/Navbar.vue'
 // import Test from './components/Test.vue';
 // import Search from './components/Search.vue'
 import List from './components/List.vue'
-import Post from './components/Post.vue'
 // import Demo from './components/Demo.vue'
 import { zhCN,dateZhCN } from "naive-ui";
 import { ref, provide } from 'vue';
-import { darkTheme } from 'naive-ui'
 import type { GlobalTheme } from 'naive-ui'
 const theme = ref<GlobalTheme | null>(null)
 theme.value = theme.value
@@ -29,14 +27,10 @@ provide('theme',theme)
 
       </n-layout-header>
       <n-layout-content>
-      <div id="title">
+      <!-- <div id="title">
       <h1>
-      悬赏平台
-    </h1>
-    <n-message-provider>
-      <Post></Post>
-    </n-message-provider>
-    </div>
+      </h1>
+    </div> -->
     <List></List>
       </n-layout-content>
 

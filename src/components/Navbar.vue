@@ -2,12 +2,13 @@
   <div class="navbar">
     <div class="nav-left" style="width: 100px;">
       <!-- 导航栏左侧内容 -->
-      <n-space justify="space-around" :wrap="false">
+      <n-space justify="between-around" :wrap="false">
         <!-- <n-button text @click="handleButtonClick('about')" class="nav-button">关于</n-button> -->
         <n-button text @click="handleButtonClick('contact')" class="nav-button">联系我们</n-button>
         <n-button text @click="changetheme">
 		      {{ themebtntit }}
         </n-button>
+        <Post></Post>
       </n-space>
       
     </div>
@@ -169,6 +170,7 @@
 </template>
 
 <script setup lang="ts">
+import Post from './Post.vue'
 import { darkTheme } from "naive-ui";
 import { inject } from 'vue';
 import qs from 'qs'

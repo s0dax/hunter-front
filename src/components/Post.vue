@@ -1,6 +1,6 @@
 <template>
-    <n-button @click="showPostModal = true">
-      来吧
+    <n-button text type="warning" @click="showPostModal = true">
+      发布
     </n-button>
     <n-modal
       v-model:show="showPostModal"

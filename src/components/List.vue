@@ -233,7 +233,7 @@ export default defineComponent({
 
 <style scoped>
 .n-card {
-  width: 600px;
+  width: 700px;
   @media (max-width: 767px) {
     /* 在小于等于 767px 的屏幕上，取消两侧留白 */
     width: 370px;
