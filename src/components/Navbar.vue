@@ -4,7 +4,7 @@
       <!-- 导航栏左侧内容 -->
       <n-space justify="between-around" :wrap="false">
         <!-- <n-button text @click="handleButtonClick('about')" class="nav-button">关于</n-button> -->
-        <n-button text @click="handleButtonClick('contact')" class="nav-button">联系我们</n-button>
+        <!-- <n-button text @click="handleButtonClick('contact')" class="nav-button">联系我们</n-button> -->
         <n-button text @click="changetheme">
 		      {{ themebtntit }}
         </n-button>
@@ -66,8 +66,8 @@
     >
       <n-tab-pane name="signin" tab="登录">
         <n-form>
-          <n-form-item-row label="邮箱/账号">
-            <n-input v-model:value="userid" placeholder="请输入邮箱或账号"/>
+          <n-form-item-row label="邮箱">
+            <n-input v-model:value="userid" placeholder="请输入邮箱"/>
           </n-form-item-row>
           <n-form-item-row label="密码">
             <n-input
@@ -362,9 +362,9 @@ const handleSelect = (key: string | number) => {
     localStorage.removeItem('userInfo');
   }
 };
-const handleButtonClick = (route: string) => {
-  console.log(`按钮点击: ${route}`);
-};
+// const handleButtonClick = (route: string) => {
+//   console.log(`按钮点击: ${route}`);
+// };
 const openModal = (tab: string) => {
       showModal.value = true
       activeTab.value = tab
@@ -415,6 +415,7 @@ const handleLogin = async () => {
       showModal.value = false;
     } else {
       // 登录失败，可以给用户提供相应的提示信息
+      message.error('登录失败，用户名与密码不匹配');
       console.log('登录失败：用户名与密码不匹配');
     }
   } catch (error) {
