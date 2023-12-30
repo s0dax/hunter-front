@@ -1,10 +1,10 @@
 <template>
   <div class="navbar">
-    <div class="nav-left">
+    <div class="nav-left" style="width: 100px;">
       <!-- 导航栏左侧内容 -->
-      <n-space>
+      <n-space justify="space-around" :wrap="false">
         <n-button text @click="handleButtonClick('home')" class="nav-button">首页</n-button>
-        <n-button text @click="handleButtonClick('about')" class="nav-button">关于</n-button>
+        <!-- <n-button text @click="handleButtonClick('about')" class="nav-button">关于</n-button> -->
         <n-button text @click="handleButtonClick('contact')" class="nav-button">联系我们</n-button>
       </n-space>
       
@@ -198,7 +198,7 @@ const model = ref<ModelType>({
       department: null,
       semester: null
 })
-const keyWord = inject('keyWord')
+const keyWord = inject<any>('keyWord')
 // keyWord.value = inject('keyWord')
 const keyWordValue = ref('')
 const verifyId = ref(0)
@@ -206,7 +206,7 @@ const message = useMessage()
 const formRef = ref<FormInst | null>(null)
 const rPasswordFormItemRef = ref<FormItemInst | null>(null)
 function validatePasswordStartWith (
-    rule: FormItemRule,
+    _rule: FormItemRule,
     value: string
   ): boolean {
     return (
@@ -216,14 +216,14 @@ function validatePasswordStartWith (
     )
   }
 
-function validatePasswordSame (rule: FormItemRule, value: string): boolean {
+function validatePasswordSame (_rule: FormItemRule, value: string): boolean {
     return value === model.value.password
   }
 const rules: FormRules = {
       username: [
         {
           required: true,
-          validator (rule: FormItemRule, value: string) {
+          validator (_rule: FormItemRule, value: string) {
             if (!value) {
               return new Error('需要用户名')
             } 
@@ -367,7 +367,7 @@ const handleLogin = async () => {
     });
     //http://localhost:80 http://43.143.250.26:80
     // 发送登录请求到后端
-    const response = await axios.post('http://localhost:80/login', requestData, {
+    const response = await axios.post('http://43.143.250.26:8080/login', requestData, {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded', // 设置请求头为表单数据格式
       },
@@ -377,11 +377,11 @@ const handleLogin = async () => {
     if (response.data) {
       // 登录成功，可以保存用户登录状态，执行跳转等操作
       console.log('登录成功');
-      const userInfoResponse = await axios.get(`http://localhost:80/user/${response.data}`);
+      const userInfoResponse = await axios.get(`http://43.143.250.26:8080/user/${response.data}`);
       const formData = qs.stringify({
         userid: response.data
       })
-      const userImgResponse = await axios.get(`http://localhost:80/img/profilePic?${formData}`);
+      const userImgResponse = await axios.get(`http://43.143.250.26:8080/img/profilePic?${formData}`);
       console.log("imgSrc:",userImgResponse.data.userimgpath)
       // 保存用户信息到localStorage
       localStorage.setItem('userInfo', JSON.stringify({
@@ -420,7 +420,7 @@ const handleSignin = async () => {
     });
     //http://localhost:80 http://43.143.250.26:80
     // 发送登录请求到后端
-    const response = await axios.post('http://localhost:80/user/verify',formData,{
+    const response = await axios.post('http://43.143.250.26:8080/user/verify',formData,{
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
     },
@@ -429,12 +429,12 @@ const handleSignin = async () => {
     // 根据后端返回的数据处理登录结果
     if (response.data) {
       console.log('注册成功');
-      const userInfoResponse = await axios.get(`http://43.143.250.26/user/${response.data}`);
+      const userInfoResponse = await axios.get(`http://43.143.250.26:8080/user/${response.data}`);
       // // 保存用户信息到localStorage
       const formData = qs.stringify({
         userid: response.data
       })
-      const userImgResponse = await axios.get(`http://localhost:80/img/profilePic?${formData}`);
+      const userImgResponse = await axios.get(`http://43.143.250.26:8080/img/profilePic?${formData}`);
       localStorage.setItem('userInfo', JSON.stringify({
         userid: Number(response.data),
         username: userInfoResponse.data.username,
@@ -464,7 +464,7 @@ const handleVerify = async () => {
     const formData = new FormData();
     console.log(formData);
     formData.append('userMailAddress', model.value.mallAddress);
-    const response = await axios.post('http://localhost:80/user',formData, {
+    const response = await axios.post('http://43.143.250.26:8080/user',formData, {
       headers: {
               'Content-Type': 'multipart/form-data',
       },
@@ -506,7 +506,7 @@ const getUserImg = () => {
   const userInfo = localStorage.getItem('userInfo');
   if (userInfo) {
     const { userImg } = JSON.parse(userInfo);
-    const url = 'http://43.143.250.26/defaultProfilePic/'
+    const url = 'http://43.143.250.26:8080/defaultProfilePic/'
     return url + userImg;
   }
   return '';
@@ -515,9 +515,7 @@ const getUserImg = () => {
 
 <style scoped>
 .navbar {
-  background-color: #fff;
-  color: #333;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  min-width: 50%;
   padding: 10px 20px;
   display: flex;
   justify-content: space-between;
@@ -525,8 +523,8 @@ const getUserImg = () => {
 }
 
 .nav-left {
-  display: flex;
-  align-items: center;
+  /* display: flex;
+  align-items: center; */
 }
 
 .nav-right {
@@ -535,11 +533,11 @@ const getUserImg = () => {
 }
 
 .nav-button {
-  background: none;
+  /* background: none;
   border: none;
   cursor: pointer;
   font-size: 16px;
-  padding: 10px;
+  padding: 10px; */
 }
 
 .search-container {

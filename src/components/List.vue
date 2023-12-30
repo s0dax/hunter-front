@@ -1,6 +1,6 @@
 <template>
-  <div id="outer" align-items= center; style="justify-content: center;display: flex;align-items: center;">
-    <n-space vertical size="large" style="align-items: center; margin-top: 20px;width: 80%;">
+  <div ref="outerDivRef">
+    <n-space vertical size="large" style="align-items: center; margin-top: 20px;">
     <n-card embedded size="huge" v-for="requirement in requirements" :key="requirement.requireid" hoverable @click="handleCardClick" class="custom-card">
       <template #header>
         <div>
@@ -37,7 +37,7 @@
         {{ requirement.description }}
       </div>
 
-      <img v-for="image in requirement.img" width="515" :src="'http://43.143.250.26/requires/'+requirement.requireid + '/' + image.imgpath">
+      <img class="img" v-for="image in requirement.img" :src="'http://43.143.250.26:8080/requires/'+requirement.requireid + '/' + image.imgpath">
     </n-card>
     <n-pagination
     size="large"
@@ -53,6 +53,8 @@
     </n-card> -->
   </n-space>
   </div>
+
+
   
 </template>
 
@@ -90,7 +92,7 @@ interface IPage<T> {
 
 export default defineComponent({
   setup() {
-    const keyWord = inject('keyWord')
+    const keyWord = inject<any>('keyWord')
     const requirements = ref<Requirement[]>([]);
     const page = ref(1);
     const pageSize = ref(10);
@@ -108,7 +110,7 @@ export default defineComponent({
 
     const fetchData = async () => {
       try {
-        const response: AxiosResponse<IPage<Requirement>> = await axios.get(`http://localhost:80/search/require`, {
+        const response: AxiosResponse<IPage<Requirement>> = await axios.get(`http://43.143.250.26:8080/search/require`, {
           params: {
             keyword: keyWord.value,
             pageNum: page.value,
@@ -121,16 +123,16 @@ export default defineComponent({
         // 遍历需求列表，获取用户信息
         for (const requirement of response.data.records) {
           // 根据 userid 发起请求获取用户信息
-          const userResponse: AxiosResponse<any> = await axios.get(`http://43.143.250.26/user/${requirement.userid}`); //http://localhost:80 http://43.143.250.26:80
+          const userResponse: AxiosResponse<any> = await axios.get(`http://43.143.250.26:8080/user/${requirement.userid}`); //http://localhost:80 http://43.143.250.26:80
           const formData = qs.stringify({
             userid: requirement.userid
           })
-          const userImgResponse = await axios.get(`http://localhost:80/img/profilePic?${formData}`);
-          const reuqireImgResponse = await axios.get(`http://localhost:80/require/${requirement.requireid}/img`);
+          const userImgResponse = await axios.get(`http://43.143.250.26:8080/img/profilePic?${formData}`);
+          const reuqireImgResponse = await axios.get(`http://43.143.250.26:8080/require/${requirement.requireid}/img`);
           requirement.img = reuqireImgResponse.data
           // 将用户信息添加到 requirement 对象中
           requirement.username = userResponse.data.username;
-          requirement.endtime = 'http://43.143.250.26/defaultProfilePic/'+userImgResponse.data.userimgpath
+          requirement.endtime = 'http://43.143.250.26:8080/defaultProfilePic/'+userImgResponse.data.userimgpath
           const create = new Date(requirement.createtime);
           const now = new Date();
           const timeDifference = now.getTime() - create.getTime();
@@ -146,7 +148,7 @@ export default defineComponent({
     };
     const fetchDataSearch = async () => {
       try {
-        const response: AxiosResponse<IPage<Requirement>> = await axios.get(`http://localhost:80/search/require`, {
+        const response: AxiosResponse<IPage<Requirement>> = await axios.get(`http://43.143.250.26:8080/search/require`, {
           params: {
             keyword: keyWord.value,
           },
@@ -157,16 +159,16 @@ export default defineComponent({
         // 遍历需求列表，获取用户信息
         for (const requirement of response.data.records) {
           // 根据 userid 发起请求获取用户信息
-          const userResponse: AxiosResponse<any> = await axios.get(`http://43.143.250.26/user/${requirement.userid}`); //http://localhost:80 http://43.143.250.26:80
+          const userResponse: AxiosResponse<any> = await axios.get(`http://43.143.250.26:8080/user/${requirement.userid}`); //http://localhost:80 http://43.143.250.26:80
           const formData = qs.stringify({
             userid: requirement.userid
           })
-          const userImgResponse = await axios.get(`http://localhost:80/img/profilePic?${formData}`);
-          const reuqireImgResponse = await axios.get(`http://localhost:80/require/${requirement.requireid}/img`);
+          const userImgResponse = await axios.get(`http://43.143.250.26:8080/img/profilePic?${formData}`);
+          const reuqireImgResponse = await axios.get(`http://43.143.250.26:8080/require/${requirement.requireid}/img`);
           requirement.img = reuqireImgResponse.data
           // 将用户信息添加到 requirement 对象中
           requirement.username = userResponse.data.username;
-          requirement.endtime = 'http://43.143.250.26/defaultProfilePic/'+userImgResponse.data.userimgpath
+          requirement.endtime = 'http://43.143.250.26:8080/defaultProfilePic/'+userImgResponse.data.userimgpath
           const create = new Date(requirement.createtime);
           const now = new Date();
           const timeDifference = now.getTime() - create.getTime();
@@ -189,7 +191,35 @@ export default defineComponent({
     });
     onMounted(fetchData);
 
+    const outerWidth = ref<number>(0);  // 指定 outerWidth 的类型为 number
+    const innerWidth = ref<number>(0);  // 指定 innerWidth 的类型为 number
+
+    const outerDivRef = ref<HTMLElement | null>(null);  // 指定 outerDivRef 的类型为 HTMLElement 或 null
+
+    const updateWidths = () => {
+      // 获取外层 div 的宽度
+      outerWidth.value = outerDivRef.value?.offsetWidth || 0;
+      console.log(outerDivRef.value?.offsetWidth)
+      // 计算子 div 的宽度为外层宽度的 0.4 倍
+      innerWidth.value = Math.round(outerWidth.value * 0.4);
+    };
+
+    // 在组件挂载后获取一次宽度
+    onMounted(() => {
+      updateWidths();
+    });
+
+    // 在外层 div 尺寸变化时更新宽度
+    watch(
+      () => outerDivRef.value?.clientWidth,
+      () => {
+        updateWidths();
+      }
+    );
     return {
+      outerDivRef,
+      outerWidth,
+      innerWidth,
       keyWord,
       page,
       pageSize,
@@ -204,8 +234,17 @@ export default defineComponent({
 <style scoped>
 .n-card {
   width: 600px;
-  cursor: pointer;
-  border-radius: 10px;
+  @media (max-width: 767px) {
+    /* 在小于等于 767px 的屏幕上，取消两侧留白 */
+    width: 370px;
+  }
+}
+.img {
+  width: 515px;
+  @media (max-width: 767px) {
+    /* 在小于等于 767px 的屏幕上，取消两侧留白 */
+    width: 290px;
+  }
 }
 .myfooter{
   display: flex;

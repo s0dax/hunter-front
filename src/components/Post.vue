@@ -102,14 +102,14 @@
           status: 'Available',
         };
   
-        const response = await axios.post(`http://43.143.250.26/requireByLater/${deadLine.value}`, qs.stringify(postData));
+        const response = await axios.post(`http://43.143.250.26:8080/requireByLater/${deadLine.value}`, qs.stringify(postData));
         if (file.value) {
         const formData = new FormData();
         formData.append('photo', file.value);
         formData.append('requireid', response.data);
   
         try {
-          const response = await axios.post('http://43.143.250.26/img', formData, {
+          const response = await axios.post('http://43.143.250.26:8080/img', formData, {
             headers: {
               'Content-Type': 'multipart/form-data',
             },
