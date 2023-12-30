@@ -177,8 +177,8 @@ import qs from 'qs'
 import { ref,h,computed } from 'vue';
 import { useMessage, NIcon,FormInst,FormItemInst,FormItemRule,FormRules } from 'naive-ui';
 import {
-  PersonCircleOutline as UserIcon,
-  Pencil as EditIcon,
+  // PersonCircleOutline as UserIcon,
+  // Pencil as EditIcon,
   LogOutOutline as LogoutIcon,
 } from '@vicons/ionicons5';
 import { GlassesOutline, Glasses } from '@vicons/ionicons5'
@@ -245,7 +245,17 @@ const rules: FormRules = {
       password: [
         {
           required: true,
-          message: '请输入密码'
+          validator(_rule: FormItemRule, value: string) {
+            if (!value) {
+              return new Error('请输入密码');
+            } else if (value.length < 8) {
+              return new Error('密码长度必须大于8位');
+            } else if (!/\d/.test(value) || !/[a-zA-Z]/.test(value)) {
+              return new Error('密码必须包含数字和字母');
+            }
+            return true;
+          },
+          trigger: ['input', 'blur']
         }
       ],
       reenteredPassword: [
@@ -317,16 +327,16 @@ const isLoggedIn = ref(false);
 const userid = ref('')
 const password = ref('')
 const options = [
-  {
-    label: '用户资料',
-    key: 'profile',
-    icon: renderIcon(UserIcon)
-  },
-  {
-    label: '编辑用户资料',
-    key: 'editProfile',
-    icon: renderIcon(EditIcon)
-  },
+  // {
+  //   label: '用户资料',
+  //   key: 'profile',
+  //   icon: renderIcon(UserIcon)
+  // },
+  // {
+  //   label: '编辑用户资料',
+  //   key: 'editProfile',
+  //   icon: renderIcon(EditIcon)
+  // },
   {
     label: '退出登录',
     key: 'logout',
