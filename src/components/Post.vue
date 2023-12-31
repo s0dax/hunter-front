@@ -25,7 +25,7 @@
         />
         <div>
           <label class="custom-file-upload">
-          <input type="file" @change="handleFileChange" />
+          <input type="file" @change="handleFileChange" accept="image/*" multiple/>
             上传图片
           </label>
           <n-gradient-text type="success">
@@ -59,7 +59,7 @@
   import qs from 'qs';
   import { useMessage } from 'naive-ui';
   
-  const file = ref<File | null>(null);
+  const file = ref<File[] | null>(null);
   const message = useMessage();
   const showPostModal = ref(false);
   const titleValue = ref("");
@@ -76,15 +76,22 @@
   const handleFileChange = (event: Event) => {
     const target = event.target as HTMLInputElement;
     if (target.files) {
-      const selectedFile = target.files[0];
-      file.value = selectedFile;
-      console.log(selectedFile.name);
-      image.value=selectedFile.name
+      const selectedFile = Array.from(target.files);
+      const isImage = selectedFile.every(file => file.type.startsWith('image/'));
+      if(isImage) {
+        file.value = selectedFile;
+        console.log(selectedFile.map(file => file.name));
+        // console.log(selectedFile.name);
+        image.value = `${selectedFile.length} 张图片`;
+      } else {
+        target.value = '';
+        file.value = null;
+        message.warning("只能上传图片")
+      }
+
     }
   };
   const publishRequirement = async () => {
-
-  
     try {
       const userInfo = localStorage.getItem('userInfo');
       if (userInfo) {
@@ -103,9 +110,11 @@
         };
   
         const response = await axios.post(`http://43.143.250.26:8080/requireByLater/${deadLine.value}`, qs.stringify(postData));
-        if (file.value) {
+        if (file.value && file.value.length > 0) {
         const formData = new FormData();
-        formData.append('photo', file.value);
+        for (const selectedFile of file.value) {
+          formData.append('photos[]', selectedFile);
+        }
         formData.append('requireid', response.data);
   
         try {

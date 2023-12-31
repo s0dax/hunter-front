@@ -1,6 +1,6 @@
 <!-- <template>
   <div>
-    <input type="file" @change="handleFileChange" />
+    <input type="file" @change="handleFileChange" multiple/>
     <button @click="uploadImage">上传图片</button>
   </div>
 </template>
