@@ -25,7 +25,9 @@ const uploadImage = async () => {
     const formData = new FormData();
     formData.append('photo', componentState.file);
     formData.append('requireid','1');
-    console.log(componentState.file)
+    for (const entry of formData.entries()) {
+      console.log(entry);
+    }
     try {
       // 发送POST请求到后端
       const response = await axios.post('http://localhost:80/img', formData, {

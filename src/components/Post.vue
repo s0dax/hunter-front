@@ -81,6 +81,9 @@
       if(isImage) {
         file.value = selectedFile;
         console.log(selectedFile.map(file => file.name));
+        // for (const selectedFile of file.value) {
+        //   console.log(selectedFile)
+        // }
         // console.log(selectedFile.name);
         image.value = `${selectedFile.length} 张图片`;
       } else {
@@ -111,23 +114,25 @@
   
         const response = await axios.post(`http://43.143.250.26:8080/requireByLater/${deadLine.value}`, qs.stringify(postData));
         if (file.value && file.value.length > 0) {
-        const formData = new FormData();
+        
         for (const selectedFile of file.value) {
-          formData.append('photos[]', selectedFile);
-        }
-        formData.append('requireid', response.data);
-  
-        try {
+          const formData = new FormData();
+          formData.append('photo', selectedFile);
+          formData.append('requireid', response.data);
+          console.log(selectedFile)
+          try {
           const response = await axios.post('http://43.143.250.26:8080/img', formData, {
             headers: {
               'Content-Type': 'multipart/form-data',
             },
           });
-  
           console.log('上传成功', response.data);
         } catch (error) {
           console.error('上传失败', error);
         }
+        }
+        
+
       } else {
         console.warn('请选择要上传的图片');
       }
@@ -143,7 +148,7 @@
   
   const onlyAllowDecimal = (value: string) => {
     if (!value) return true;
-    return /^\d+(\.\d{0,2})?$/.test(value);
+    return /^(?!0\d)\d+(\.\d{0,2})?$/.test(value);
   };
   
   const handleUpdateValue = (value: number) => {

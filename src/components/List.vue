@@ -196,26 +196,6 @@ export default defineComponent({
 
     const outerDivRef = ref<HTMLElement | null>(null);  // 指定 outerDivRef 的类型为 HTMLElement 或 null
 
-    const updateWidths = () => {
-      // 获取外层 div 的宽度
-      outerWidth.value = outerDivRef.value?.offsetWidth || 0;
-      console.log(outerDivRef.value?.offsetWidth)
-      // 计算子 div 的宽度为外层宽度的 0.4 倍
-      innerWidth.value = Math.round(outerWidth.value * 0.4);
-    };
-
-    // 在组件挂载后获取一次宽度
-    onMounted(() => {
-      updateWidths();
-    });
-
-    // 在外层 div 尺寸变化时更新宽度
-    watch(
-      () => outerDivRef.value?.clientWidth,
-      () => {
-        updateWidths();
-      }
-    );
     return {
       outerDivRef,
       outerWidth,
