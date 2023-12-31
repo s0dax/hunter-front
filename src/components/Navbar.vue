@@ -22,7 +22,7 @@
       <!-- 导航栏右侧内容，包括登录注册和用户头像下拉菜单 -->
       <template v-if="!isLoggedIn">
         <!-- 未登录时显示登录和注册按钮 -->
-        <n-space :wrap="false">
+        <n-space>
           <n-button @click="openModal('signin')" class="auth-button">登录</n-button>
           <n-button @click="openModal('signup')" class="auth-button">注册</n-button>
         </n-space>
